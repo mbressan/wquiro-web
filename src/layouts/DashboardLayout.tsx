@@ -1,31 +1,34 @@
-import { Outlet, Link } from 'react-router-dom'
+import { Outlet, useMatches } from 'react-router-dom'
+import { Sidebar } from '@/components/layout/Sidebar'
+import { Header } from '@/components/layout/Header'
 import { BillingBanner } from '@/components/layout/BillingBanner'
-import { useLogout } from '@/hooks/useAuth'
-import { useAuthStore } from '@/stores/authStore'
+
+const routeTitles: Record<string, string> = {
+  '/': 'Dashboard',
+  '/agenda': 'Agenda',
+  '/pacientes': 'Pacientes',
+  '/financeiro/caixa': 'Caixa',
+  '/financeiro/dashboard': 'Financeiro',
+  '/configuracoes': 'Configurações',
+}
 
 export function DashboardLayout() {
-  const logoutMutation = useLogout()
-  const user = useAuthStore((s) => s.user)
-  const clinic = useAuthStore((s) => s.clinic)
+  const matches = useMatches()
+  const currentPath = matches[matches.length - 1]?.pathname ?? '/'
+  const title = routeTitles[currentPath] ?? ''
 
   return (
-    <div className="dashboard-layout">
-      <BillingBanner />
-      <header className="dashboard-header">
-        <div className="dashboard-header__brand">
-          <Link to="/">QuiroGestão</Link>
-          {clinic && <span className="dashboard-header__clinic">{clinic.name}</span>}
-        </div>
-        <div className="dashboard-header__user">
-          {user && <span>{user.name}</span>}
-          <button onClick={() => logoutMutation.mutate()} disabled={logoutMutation.isPending}>
-            Sair
-          </button>
-        </div>
-      </header>
-      <main className="dashboard-main">
-        <Outlet />
-      </main>
+    <div className="flex h-screen overflow-hidden bg-slate-50">
+      <Sidebar />
+
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <BillingBanner />
+        <Header title={title} />
+
+        <main className="flex-1 overflow-y-auto">
+          <Outlet />
+        </main>
+      </div>
     </div>
   )
 }

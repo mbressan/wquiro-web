@@ -6,6 +6,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useAuthStore } from '@/stores/authStore'
 import api from '@/lib/api'
 import type { RegisterResponse } from '@/types/auth'
+import { FormField, Input, SubmitButton } from '@/components/auth/FormField'
 
 const registerSchema = z.object({
   clinic_name: z.string().min(2, 'Nome da clínica deve ter pelo menos 2 caracteres'),
@@ -52,58 +53,81 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <h1 className="auth-title">QuiroGestão</h1>
-        <h2 className="auth-subtitle">Criar conta</h2>
-
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <div className="form-field">
-            <label htmlFor="clinic_name">Nome da clínica</label>
-            <input id="clinic_name" type="text" {...register('clinic_name')} />
-            {errors.clinic_name && (
-              <span className="form-error">{errors.clinic_name.message}</span>
-            )}
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="name">Seu nome</label>
-            <input id="name" type="text" {...register('name')} />
-            {errors.name && (
-              <span className="form-error">{errors.name.message}</span>
-            )}
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="email">E-mail</label>
-            <input id="email" type="email" autoComplete="email" {...register('email')} />
-            {errors.email && (
-              <span className="form-error">{errors.email.message}</span>
-            )}
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="password">Senha</label>
-            <input id="password" type="password" autoComplete="new-password" {...register('password')} />
-            {errors.password && (
-              <span className="form-error">{errors.password.message}</span>
-            )}
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="phone">Telefone (opcional)</label>
-            <input id="phone" type="tel" {...register('phone')} />
-          </div>
-
-          <button type="submit" disabled={isSubmitting || registerMutation.isPending}>
-            {registerMutation.isPending ? 'Criando conta...' : 'Criar conta'}
-          </button>
-        </form>
-
-        <p className="auth-footer">
-          Já tem conta? <Link to="/login">Entrar</Link>
-        </p>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-semibold text-gray-900">Criar conta</h2>
+        <p className="mt-1 text-sm text-gray-500">14 dias grátis, sem cartão de crédito.</p>
       </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+        <FormField id="clinic_name" label="Nome da clínica" error={errors.clinic_name?.message}>
+          <Input
+            id="clinic_name"
+            type="text"
+            placeholder="Clínica Vertebral"
+            error={!!errors.clinic_name}
+            {...register('clinic_name')}
+          />
+        </FormField>
+
+        <FormField id="name" label="Seu nome" error={errors.name?.message}>
+          <Input
+            id="name"
+            type="text"
+            placeholder="Dr. João Silva"
+            error={!!errors.name}
+            {...register('name')}
+          />
+        </FormField>
+
+        <FormField id="email" label="E-mail" error={errors.email?.message}>
+          <Input
+            id="email"
+            type="email"
+            autoComplete="email"
+            placeholder="seu@email.com"
+            error={!!errors.email}
+            {...register('email')}
+          />
+        </FormField>
+
+        <FormField id="password" label="Senha" error={errors.password?.message}>
+          <Input
+            id="password"
+            type="password"
+            autoComplete="new-password"
+            placeholder="Mínimo 8 caracteres"
+            error={!!errors.password}
+            {...register('password')}
+          />
+        </FormField>
+
+        <FormField id="phone" label="Telefone (opcional)">
+          <Input
+            id="phone"
+            type="tel"
+            placeholder="(11) 99999-9999"
+            {...register('phone')}
+          />
+        </FormField>
+
+        {registerMutation.isError && (
+          <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+            Erro ao criar conta. Verifique os dados e tente novamente.
+          </p>
+        )}
+
+        <SubmitButton loading={isSubmitting || registerMutation.isPending}>
+          Criar conta grátis
+        </SubmitButton>
+      </form>
+
+      <p className="text-center text-sm text-gray-500">
+        Já tem conta?{' '}
+        <Link to="/login" className="font-medium text-primary-600 hover:underline">
+          Entrar
+        </Link>
+      </p>
     </div>
   )
 }
