@@ -1,7 +1,10 @@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { X, Pencil } from 'lucide-react';
+import { X, Pencil, Play } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { StatusBadge } from './StatusBadge';
+import { useCheckin } from '@/hooks/useAppointments';
 import type { Appointment } from '@/types/appointment';
 
 const APPOINTMENT_TYPE_LABELS: Record<string, string> = {
@@ -17,6 +20,8 @@ interface AppointmentDetailModalProps {
 }
 
 export function AppointmentDetailModal({ appointment, onClose, onEdit }: AppointmentDetailModalProps) {
+  const navigate = useNavigate();
+  const checkin = useCheckin(appointment.id);
   const start = new Date(appointment.scheduled_at);
   const end = new Date(appointment.end_at);
   const dateLabel = format(start, "EEEE, d 'de' MMMM 'de' yyyy", { locale: ptBR });
@@ -28,6 +33,18 @@ export function AppointmentDetailModal({ appointment, onClose, onEdit }: Appoint
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
     if (e.key === 'Escape') onClose();
+  }
+
+  function handleCheckin() {
+    checkin.mutate(undefined, {
+      onSuccess: (data) => {
+        onClose();
+        navigate(`/prontuario/${data.clinical_record_id}`, {
+          state: { from: 'agenda' },
+        });
+      },
+      onError: () => toast.error('Erro ao iniciar atendimento.'),
+    });
   }
 
   return (
@@ -101,11 +118,21 @@ export function AppointmentDetailModal({ appointment, onClose, onEdit }: Appoint
           </button>
           <button
             onClick={onEdit}
-            className="inline-flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+            className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
           >
             <Pencil className="h-4 w-4" />
             Editar
           </button>
+          {appointment.status === 'scheduled' && (
+            <button
+              onClick={handleCheckin}
+              disabled={checkin.isPending}
+              className="inline-flex items-center gap-1.5 rounded-md bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700 disabled:opacity-60"
+            >
+              <Play className="h-4 w-4" />
+              {checkin.isPending ? 'Iniciando...' : 'Iniciar Atendimento'}
+            </button>
+          )}
         </div>
       </div>
     </div>

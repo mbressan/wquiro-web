@@ -57,10 +57,14 @@ export function useUpdateAppointment(id: string) {
   });
 }
 
+export interface CheckinResponse extends Appointment {
+  clinical_record_id: string;
+}
+
 export function useCheckin(id: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: () => api.post<Appointment>(`/consultas/${id}/checkin/`).then((r) => r.data),
+    mutationFn: () => api.post<CheckinResponse>(`/consultas/${id}/checkin/`).then((r) => r.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: [APPOINTMENTS_KEY] });
     },

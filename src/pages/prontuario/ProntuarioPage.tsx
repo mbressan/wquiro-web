@@ -1,6 +1,7 @@
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { useRecord, useUpdateRecord } from '@/hooks/useRecords';
 import { AnamnesisForm } from '@/components/prontuario/AnamnesisForm';
 import { SOAPForm } from '@/components/prontuario/SOAPForm';
@@ -18,6 +19,8 @@ const RECORD_TYPE_LABELS: Record<string, string> = {
 };
 
 export default function ProntuarioPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams<{ id: string }>();
   const { data: record, isLoading, isError } = useRecord(id);
   const update = useUpdateRecord(id!);
@@ -91,7 +94,18 @@ export default function ProntuarioPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-6 space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Prontuário</h1>
+        <div className="flex items-center gap-3">
+          {location.state?.from === 'agenda' && (
+            <button
+              onClick={() => navigate('/agenda')}
+              className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Agenda
+            </button>
+          )}
+          <h1 className="text-2xl font-bold text-gray-900">Prontuário</h1>
+        </div>
         <span className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600">
           {RECORD_TYPE_LABELS[record.record_type] ?? record.record_type}
         </span>
