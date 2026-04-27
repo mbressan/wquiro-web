@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import resourceTimeGridPlugin from '@fullcalendar/resource-timegrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -29,7 +30,13 @@ export function AgendaCalendar({
   onEventDrop,
   onDatesChange,
 }: AgendaCalendarProps) {
+  const calendarRef = useRef<FullCalendar>(null);
   const isResourceView = viewMode === 'resourceTimeGridDay';
+
+  // Switch view imperatively when viewMode prop changes (initialView is mount-only in FullCalendar)
+  useEffect(() => {
+    calendarRef.current?.getApi().changeView(viewMode);
+  }, [viewMode]);
 
   const resources = professionals.map((p) => ({
     id: p.id,
@@ -53,6 +60,7 @@ export function AgendaCalendar({
   return (
     <div className="rounded-lg border bg-white p-2 shadow-sm overflow-auto">
       <FullCalendar
+        ref={calendarRef}
         plugins={[resourceTimeGridPlugin, timeGridPlugin, dayGridPlugin, interactionPlugin]}
         initialView={viewMode}
         headerToolbar={{
@@ -63,7 +71,7 @@ export function AgendaCalendar({
         locale="pt-br"
         slotMinTime="07:00:00"
         slotMaxTime="22:00:00"
-        allDaySlot={false}
+        allDaySlot={viewMode === 'dayGridMonth' ? undefined : false}
         resources={isResourceView ? resources : []}
         events={events}
         editable
