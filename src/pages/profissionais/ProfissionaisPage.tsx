@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { Plus } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-import { PageHeader, Button, StatusBadge, PageContainer } from '@/components/ui';
+import { PageHeader, Button, StatusBadge, PageContainer, SkeletonTableRows } from '@/components/ui';
 import {
   useProfessionalsAdmin,
   useDeactivateProfessional,
@@ -171,7 +171,7 @@ export default function ProfissionaisPage() {
       {activeTab === 'ativos' && (
         <>
           {activeQuery.isLoading ? (
-            <p className="text-sm text-gray-500">Carregando...</p>
+            <div className="overflow-hidden rounded-lg border border-gray-200"><table className="w-full text-sm"><tbody><SkeletonTableRows rows={5} cols={4} /></tbody></table></div>
           ) : (
             <ProfessionalTable
               professionals={activeQuery.data?.results ?? []}
@@ -186,7 +186,7 @@ export default function ProfissionaisPage() {
       {activeTab === 'inativos' && (
         <>
           {inactiveQuery.isLoading ? (
-            <p className="text-sm text-gray-500">Carregando...</p>
+            <div className="overflow-hidden rounded-lg border border-gray-200"><table className="w-full text-sm"><tbody><SkeletonTableRows rows={5} cols={4} /></tbody></table></div>
           ) : (
             <ProfessionalTable
               professionals={inactiveQuery.data?.results ?? []}
@@ -201,7 +201,7 @@ export default function ProfissionaisPage() {
       {activeTab === 'convites' && (
         <>
           {invitesQuery.isLoading ? (
-            <p className="text-sm text-gray-500">Carregando...</p>
+            <div className="overflow-hidden rounded-lg border border-gray-200"><table className="w-full text-sm"><tbody><SkeletonTableRows rows={3} cols={5} /></tbody></table></div>
           ) : (
             <div className="overflow-hidden rounded-lg border border-gray-200">
               <table className="w-full text-sm">
@@ -272,7 +272,7 @@ export default function ProfissionaisPage() {
       {activeTab === 'especialidades' && (
         <>
           {specialtiesQuery.isLoading ? (
-            <p className="text-sm text-gray-500">Carregando...</p>
+            <div className="overflow-hidden rounded-lg border border-gray-200"><table className="w-full text-sm"><tbody><SkeletonTableRows rows={4} cols={3} /></tbody></table></div>
           ) : (
             <SpecialtyTable
               specialties={specialtiesQuery.data ?? []}

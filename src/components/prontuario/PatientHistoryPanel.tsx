@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Skeleton } from '@/components/ui';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { usePatientRecords } from '@/hooks/useRecords';
 import type { ClinicalRecordListItem } from '@/types/record';
@@ -53,7 +54,13 @@ export function PatientHistoryPanel({ patientId, currentRecordId }: PatientHisto
 
   const history = records?.filter((r) => r.id !== currentRecordId) ?? [];
 
-  if (isLoading) return <p className="text-sm text-gray-400">Carregando histórico...</p>;
+  if (isLoading) return (
+    <div className="rounded-lg border bg-white p-4 space-y-2">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <Skeleton key={i} className="h-10 w-full" />
+      ))}
+    </div>
+  );
   if (history.length === 0) return <p className="text-sm text-gray-400">Sem histórico anterior.</p>;
 
   return (

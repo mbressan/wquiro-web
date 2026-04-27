@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard,
   CalendarDays,
@@ -94,9 +94,8 @@ interface NavGroupProps {
 
 function NavGroup({ icon: Icon, label, children }: NavGroupProps) {
   const [open, setOpen] = useState(false)
-  const isChildActive = children.some((c) =>
-    window.location.pathname.startsWith(c.to),
-  )
+  const { pathname } = useLocation()
+  const isChildActive = children.some((c) => pathname.startsWith(c.to))
 
   return (
     <div>

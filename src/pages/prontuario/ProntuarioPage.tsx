@@ -1,7 +1,7 @@
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { PageHeaderBack, StatusBadge, PageContainer } from '@/components/ui';
+import { PageHeaderBack, StatusBadge, PageContainer, SkeletonPage } from '@/components/ui';
 import { useRecord, useUpdateRecord } from '@/hooks/useRecords';
 import { AnamnesisForm } from '@/components/prontuario/AnamnesisForm';
 import { SOAPForm } from '@/components/prontuario/SOAPForm';
@@ -28,7 +28,7 @@ export default function ProntuarioPage() {
     posturalAssessment ??
     ((record?.clinical_data as any)?.posture_assessment as PosturalAssessment | undefined);
 
-  if (isLoading) return <div className="p-8 text-center text-gray-400">Carregando prontuário...</div>;
+  if (isLoading) return <SkeletonPage />;
   if (isError || !record) return <div className="p-8 text-center text-red-500">Prontuário não encontrado.</div>;
 
   const showPosturalForm =

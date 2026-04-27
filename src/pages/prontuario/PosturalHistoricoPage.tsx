@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { PageContainer, PageHeaderBack } from '@/components/ui'
+import { PageContainer, PageHeaderBack, SkeletonPage } from '@/components/ui'
 import { usePosturalHistorico } from '@/hooks/usePosturalHistorico'
 import { PosturalComparisonView } from '@/components/prontuario/postural/PosturalComparisonView'
 import type { PosturalHistoricoItem } from '@/types/posture'
@@ -21,9 +21,7 @@ export default function PosturalHistoricoPage() {
   const [baselineId, setBaselineId] = useState<string | null>(null)
   const [currentId, setCurrentId] = useState<string | null>(null)
 
-  if (isLoading) {
-    return <div className="p-8 text-center text-gray-400">Carregando histórico postural...</div>
-  }
+  if (isLoading) return <SkeletonPage />
 
   if (isError) {
     return <div className="p-8 text-center text-red-500">Erro ao carregar histórico postural.</div>

@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { CalendarDays, ChevronRight, AlertCircle, FileText, Play } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppointments, useCheckin } from '@/hooks/useAppointments';
-import { PageHeaderBack, StatusBadge, AppointmentTypeBadge, Button, PageContainer } from '@/components/ui';
+import { PageHeaderBack, StatusBadge, AppointmentTypeBadge, Button, PageContainer, SkeletonCardList } from '@/components/ui';
 import type { Appointment } from '@/types/appointment';
 
 function AppointmentCard({ appt }: { appt: Appointment }) {
@@ -86,9 +86,7 @@ export default function PatientConsultasPage() {
     <PageContainer size="sm">
       <PageHeaderBack title="Consultas" onBack={() => navigate(-1)} />
 
-      {isLoading && (
-        <p className="py-12 text-center text-sm text-gray-400">Carregando consultas...</p>
-      )}
+      {isLoading && <SkeletonCardList cards={5} />}
 
       {isError && (
         <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">

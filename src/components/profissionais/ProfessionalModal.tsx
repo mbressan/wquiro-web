@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Modal, FormField, Input, Textarea, Button } from '@/components/ui';
+import { Modal, FormField, Input, Textarea, Button, Skeleton } from '@/components/ui';
 import type { Professional, ProfessionalCreate, ProfessionalUpdate } from '@/types/professional';
 import { useCreateProfessional, useUpdateProfessional, useProfessionalsAdmin } from '@/hooks/useProfessionals';
 import { useSpecialties, useSetProfessionalSpecialties } from '@/hooks/useSpecialties';
@@ -196,7 +196,11 @@ export function ProfessionalModal({
 
         <FormField id="pro-specialties" label="Especialidades">
           {availableSpecialties.length === 0 ? (
-            <p className="text-xs text-gray-400">Carregando especialidades…</p>
+            <div className="space-y-1.5 rounded-lg border border-gray-300 p-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-6 w-full" />
+              ))}
+            </div>
           ) : (
             <div className="max-h-36 overflow-y-auto rounded-lg border border-gray-300 p-2">
               {availableSpecialties.map((s) => (

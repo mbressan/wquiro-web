@@ -1,4 +1,5 @@
 import { usePosturalHistorico } from '@/hooks/usePosturalHistorico'
+import { Skeleton } from '@/components/ui'
 import type { PosturalAssessment, SeverityLevel } from '@/types/posture'
 import { SEVERITY_CONFIG } from '@/lib/posture-constants'
 
@@ -54,7 +55,10 @@ export function PosturalSummaryCard({ patientId, onClick }: PosturalSummaryCardP
       <h3 className="text-sm font-semibold text-gray-800 mb-2">Avaliação Postural</h3>
 
       {isLoading ? (
-        <p className="text-xs text-gray-400">Carregando...</p>
+        <div className="space-y-1.5">
+          <Skeleton className="h-3.5 w-full" />
+          <Skeleton className="h-3.5 w-3/4" />
+        </div>
       ) : assessment === null ? (
         <p className="text-xs text-gray-400">Nenhuma avaliação postural registrada</p>
       ) : (

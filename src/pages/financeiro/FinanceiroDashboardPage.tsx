@@ -1,6 +1,6 @@
 import { useFinancialDashboard } from '@/hooks/useFinancial';
 import { RevenueChart } from '@/components/financeiro/RevenueChart';
-import { PageHeader, PageContainer } from '@/components/ui';
+import { PageHeader, PageContainer, SkeletonPage } from '@/components/ui';
 
 interface KPICardProps {
   label: string;
@@ -26,7 +26,7 @@ const METHOD_LABELS: Record<string, string> = {
 export default function FinanceiroDashboardPage() {
   const { data, isLoading } = useFinancialDashboard();
 
-  if (isLoading) return <div className="p-8 text-center text-gray-400">Carregando...</div>;
+  if (isLoading) return <SkeletonPage />;
   if (!data) return null;
 
   return (

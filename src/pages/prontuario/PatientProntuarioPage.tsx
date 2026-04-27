@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { FileText, ChevronRight, AlertCircle } from 'lucide-react';
 import { usePatientRecords } from '@/hooks/useRecords';
-import { PageHeaderBack, StatusBadge, PageContainer } from '@/components/ui';
+import { PageHeaderBack, StatusBadge, PageContainer, SkeletonCardList } from '@/components/ui';
 import type { ClinicalRecordListItem } from '@/types/record';
 
 function RecordCard({ record }: { record: ClinicalRecordListItem }) {
@@ -53,9 +53,7 @@ export default function PatientProntuarioPage() {
     <PageContainer size="sm">
       <PageHeaderBack title="Prontuários" onBack={() => navigate(-1)} />
 
-      {isLoading && (
-        <p className="py-12 text-center text-sm text-gray-400">Carregando registros...</p>
-      )}
+      {isLoading && <SkeletonCardList cards={5} />}
 
       {isError && (
         <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">

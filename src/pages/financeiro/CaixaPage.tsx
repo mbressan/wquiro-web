@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { PaymentForm } from '@/components/financeiro/PaymentForm';
 import { useCaixa, useCreatePayment } from '@/hooks/useFinancial';
-import { PageHeader, Input, CardWithHeader, PageContainer } from '@/components/ui';
+import { PageHeader, Input, CardWithHeader, PageContainer, SkeletonTableRows } from '@/components/ui';
 import type { CaixaPaymentRow } from '@/types/financial';
 
 const METHOD_LABELS: Record<string, string> = {
@@ -76,7 +76,7 @@ export default function CaixaPage() {
               </thead>
               <tbody className="divide-y">
                 {isLoading ? (
-                  <tr><td colSpan={4} className="px-4 py-4 text-center text-gray-400">Carregando...</td></tr>
+                  <SkeletonTableRows rows={4} cols={4} />
                 ) : (data?.payments ?? []).length === 0 ? (
                   <tr><td colSpan={4} className="px-4 py-4 text-center text-gray-400">Nenhum pagamento hoje.</td></tr>
                 ) : (

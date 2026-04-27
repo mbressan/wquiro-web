@@ -6,7 +6,7 @@ import { usePatient, useUpdatePatient } from '@/hooks/usePatients';
 import { PatientForm } from '@/components/pacientes/PatientForm';
 import { PatientTimeline } from '@/components/pacientes/PatientTimeline';
 import { TagBadge } from '@/components/pacientes/TagBadge';
-import { Button, Modal, PageHeaderBack, PageContainer } from '@/components/ui';
+import { Button, Modal, PageHeaderBack, PageContainer, SkeletonPage } from '@/components/ui';
 import type { PatientCreate } from '@/types/patient';
 
 export default function PacienteDetalhePage() {
@@ -28,13 +28,7 @@ export default function PacienteDetalhePage() {
     });
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex h-64 items-center justify-center text-sm text-gray-500">
-        Carregando...
-      </div>
-    );
-  }
+  if (isLoading) return <SkeletonPage />;
 
   if (!patient) {
     return (

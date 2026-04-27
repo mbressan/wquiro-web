@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Skeleton } from "@/components/ui";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale/pt-BR";
 import { useSpineMapHistory } from "@/hooks/useSpineMapHistory";
@@ -76,7 +77,13 @@ export function SpineMapTimeline({ patientId }: SpineMapTimelineProps) {
   const { data, isLoading, isError } = useSpineMapHistory(patientId, page);
 
   if (isLoading) {
-    return <p className="text-sm text-gray-500">Carregando histórico...</p>;
+    return (
+      <div className="space-y-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Skeleton key={i} className="h-24 w-full rounded-lg" />
+        ))}
+      </div>
+    );
   }
 
   if (isError) {

@@ -3,6 +3,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { AuthLayout } from '@/layouts/AuthLayout'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { SkeletonPage } from '@/components/ui'
 
 const LoginPage = lazy(() =>
   import('@/pages/auth/LoginPage').then((m) => ({ default: m.LoginPage })),
@@ -28,7 +29,7 @@ const ProfissionaisPage = lazy(() => import('@/pages/profissionais/Profissionais
 const PosturalHistoricoPage = lazy(() => import('@/pages/prontuario/PosturalHistoricoPage'))
 const ConfiguracoesPage = lazy(() => import('@/pages/configuracoes/ConfiguracoesPage'))
 
-const Loading = () => <div>Carregando...</div>
+const Loading = () => <SkeletonPage />
 
 export const router = createBrowserRouter([
   {

@@ -1,30 +1,20 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, X } from 'lucide-react';
 import { usePatients, useCreatePatient, usePatientTags } from '@/hooks/usePatients';
 import { PatientTable } from '@/components/pacientes/PatientTable';
 import { PatientForm } from '@/components/pacientes/PatientForm';
-import { Button, PageHeader, Modal, PageContainer } from '@/components/ui';
+import { Button, PageHeader, Modal, PageContainer, SkeletonTableRows } from '@/components/ui';
 import type { PatientFilters, PatientCreate } from '@/types/patient';
 import { toast } from 'sonner';
 
 function useDebounce<T>(value: T, delay = 300): T {
   const [debounced, setDebounced] = useState(value);
-  const timerRef = { current: 0 };
 
-  // Simple inline debounce using useCallback and setTimeout
-  const update = useCallback(
-    (v: T) => {
-      clearTimeout(timerRef.current);
-      timerRef.current = window.setTimeout(() => setDebounced(v), delay);
-    },
-    [delay],
-  );
-
-  // Call update when value changes — using state pattern
-  useState(() => {
-    update(value);
-  });
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
 
   return debounced;
 }
@@ -125,7 +115,11 @@ export default function PacientesListPage() {
       </div>
 
       {isLoading ? (
-        <div className="py-12 text-center text-sm text-gray-500">Carregando...</div>
+        <div className="overflow-hidden rounded-lg border border-gray-200">
+          <table className="w-full text-sm">
+            <tbody><SkeletonTableRows rows={8} cols={6} /></tbody>
+          </table>
+        </div>
       ) : (
         <PatientTable
           patients={data?.results ?? []}

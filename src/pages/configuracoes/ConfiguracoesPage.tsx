@@ -1,7 +1,7 @@
 import { useAuthStore } from '@/stores/authStore';
 import { useSubscriptionCurrent } from '@/hooks/useSubscription';
 import { useLogout } from '@/hooks/useAuth';
-import { PageContainer, PageHeader, Button } from '@/components/ui';
+import { PageContainer, PageHeader, Button, SkeletonText } from '@/components/ui';
 import { Building2, User, CreditCard, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -146,7 +146,7 @@ export default function ConfiguracoesPage() {
             </div>
           </div>
         ) : (
-          <p className="text-sm text-gray-400">Carregando assinatura...</p>
+          <SkeletonText lines={3} />
         )}
       </Section>
 
