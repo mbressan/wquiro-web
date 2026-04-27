@@ -66,7 +66,7 @@ export default function PacientesListPage() {
       <PageHeader
         title="Pacientes"
         actions={
-          <Button onClick={() => setShowModal(true)}>
+          <Button size="sm" onClick={() => setShowModal(true)}>
             <Plus className="h-4 w-4" />
             Novo Paciente
           </Button>

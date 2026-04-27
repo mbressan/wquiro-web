@@ -109,31 +109,9 @@ export default function AgendaPage() {
     <PageContainer size="xl">
       <PageHeader
         title="Agenda"
+        subtitle="Visualize consultas, bloqueios e disponibilidade da equipe"
         actions={
           <div className="flex flex-wrap items-center gap-2">
-            <ContextSelector context={agendaContext} onChange={setAgendaContext} />
-            {/* Toggle de visualização */}
-            <div className="flex rounded-lg border border-gray-300 overflow-hidden">
-              {(
-                [
-                  { mode: 'resourceTimeGridDay', label: 'Geral (dia)' },
-                  { mode: 'timeGridWeek', label: 'Semana' },
-                  { mode: 'dayGridMonth', label: 'Mês' },
-                ] as const
-              ).map(({ mode, label }) => (
-                <button
-                  key={mode}
-                  onClick={() => setViewMode(mode)}
-                  className={`px-3 py-1.5 text-sm transition-colors ${
-                    viewMode === mode
-                      ? 'bg-primary-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
             <Button size="sm" onClick={() => setShowModal(true)}>
               <Plus className="h-4 w-4" /> Nova Consulta
             </Button>
@@ -144,27 +122,59 @@ export default function AgendaPage() {
         }
       />
 
+      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <ContextSelector context={agendaContext} onChange={setAgendaContext} />
+
+          {/* Toggle de visualização */}
+          <div className="inline-flex w-full overflow-hidden rounded-lg border border-gray-300 lg:w-auto">
+            {(
+              [
+                { mode: 'resourceTimeGridDay', label: 'Geral (dia)' },
+                { mode: 'timeGridWeek', label: 'Semana' },
+                { mode: 'dayGridMonth', label: 'Mês' },
+              ] as const
+            ).map(({ mode, label }) => (
+              <button
+                key={mode}
+                onClick={() => setViewMode(mode)}
+                className={`flex-1 px-3 py-2 text-sm transition-colors lg:flex-none ${
+                  viewMode === mode
+                    ? 'bg-primary-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Professional legend */}
       {professionals.length > 0 && (
-        <div className="mb-3 flex flex-wrap gap-3">
-          {professionals.map((p) => (
-            <div key={p.id} className="flex items-center gap-1.5 text-sm text-gray-700">
-              <ProfessionalColorDot color={p.color} size="sm" />
-              {p.name}
-            </div>
-          ))}
+        <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+          <div className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500">Profissionais</div>
+          <div className="flex flex-wrap gap-3">
+            {professionals.map((p) => (
+              <div key={p.id} className="flex items-center gap-1.5 text-sm text-gray-700">
+                <ProfessionalColorDot color={p.color} size="sm" />
+                {p.name}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
       {/* Booking fee alerts */}
-      {appointments
-        .filter((a) => a.booking_fee_required && !a.booking_fee_paid)
-        .slice(0, 3)
-        .map((a) => (
-          <div key={a.id} className="mb-2">
-            <BookingFeeAlert appointment={a} />
-          </div>
-        ))}
+      <div className="space-y-2">
+        {appointments
+          .filter((a) => a.booking_fee_required && !a.booking_fee_paid)
+          .slice(0, 3)
+          .map((a) => (
+            <BookingFeeAlert key={a.id} appointment={a} />
+          ))}
+      </div>
 
       <AgendaCalendar
         appointments={appointments}

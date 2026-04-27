@@ -18,7 +18,7 @@ export function AppointmentCard({ appointment, onClick }: AppointmentCardProps) 
       onKeyDown={(e) => e.key === 'Enter' && onClick?.()}
     >
       <span className="font-semibold truncate">{appointment.title}</span>
-      <StatusBadge status={extendedProps.status} />
+      <StatusBadge type="appointment" status={extendedProps.status} />
       {extendedProps.appointment_type && (
         <span className="text-gray-500 truncate">{extendedProps.appointment_type}</span>
       )}

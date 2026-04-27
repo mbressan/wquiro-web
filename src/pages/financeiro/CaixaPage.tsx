@@ -92,6 +92,7 @@ export default function CaixaPage() {
               </tbody>
             </table>
           </div>
+          </CardWithHeader>
         </div>
       </div>
     </PageContainer>
