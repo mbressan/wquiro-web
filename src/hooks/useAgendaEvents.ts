@@ -21,7 +21,9 @@ export function useAgendaEvents(filters: EventFilters = {}) {
   return useQuery({
     queryKey: [EVENTS_KEY, filters],
     queryFn: () =>
-      api.get<AgendaEvent[]>('/agenda/eventos/', { params: filters }).then((r) => r.data),
+      api
+        .get<{ results: AgendaEvent[] }>('/agenda/eventos/', { params: filters })
+        .then((r) => r.data.results),
   });
 }
 
