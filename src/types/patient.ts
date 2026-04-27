@@ -47,9 +47,9 @@ export interface PatientDetail extends Patient {
 export interface PatientCreate {
   name: string;
   phone: string;
+  date_of_birth: string;
   email?: string;
   cpf?: string;
-  date_of_birth?: string;
   gender?: PatientGender;
   address?: string;
   city?: string;

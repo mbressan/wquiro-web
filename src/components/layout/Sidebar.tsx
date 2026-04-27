@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   CalendarDays,
   Users,
+  UserCog,
   DollarSign,
   Settings,
   Activity,
@@ -27,6 +28,11 @@ const navItems = [
     label: 'Pacientes',
     icon: Users,
     to: '/pacientes',
+  },
+  {
+    label: 'Profissionais',
+    icon: UserCog,
+    to: '/profissionais',
   },
   {
     label: 'Financeiro',
@@ -145,7 +151,7 @@ export function Sidebar() {
           <Activity className="h-4 w-4 text-white" />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-gray-900">QuiroGestão</p>
+          <p className="truncate text-sm font-semibold text-gray-900">wQuiro</p>
           {clinic && (
             <p className="truncate text-xs text-gray-400">{clinic.name}</p>
           )}

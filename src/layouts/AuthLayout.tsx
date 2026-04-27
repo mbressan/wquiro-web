@@ -10,7 +10,7 @@ export function AuthLayout() {
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/20">
             <Activity className="h-5 w-5 text-white" />
           </div>
-          <span className="text-lg font-semibold text-white">QuiroGestão</span>
+          <span className="text-lg font-semibold text-white">wQuiro</span>
         </div>
 
         <div>
@@ -25,7 +25,7 @@ export function AuthLayout() {
         </div>
 
         <p className="text-xs text-primary-300">
-          © {new Date().getFullYear()} QuiroGestão. Todos os direitos reservados.
+          © {new Date().getFullYear()} wQuiro. Todos os direitos reservados.
         </p>
       </div>
 
@@ -37,7 +37,7 @@ export function AuthLayout() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600">
               <Activity className="h-4 w-4 text-white" />
             </div>
-            <span className="font-semibold text-gray-900">QuiroGestão</span>
+            <span className="font-semibold text-gray-900">wQuiro</span>
           </div>
 
           <Outlet />

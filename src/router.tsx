@@ -22,6 +22,7 @@ const AgendaPage = lazy(() => import('@/pages/agenda/AgendaPage'))
 const ProntuarioPage = lazy(() => import('@/pages/prontuario/ProntuarioPage'))
 const CaixaPage = lazy(() => import('@/pages/financeiro/CaixaPage'))
 const FinanceiroDashboardPage = lazy(() => import('@/pages/financeiro/FinanceiroDashboardPage'))
+const ProfissionaisPage = lazy(() => import('@/pages/profissionais/ProfissionaisPage'))
 
 const Loading = () => <div>Carregando...</div>
 
@@ -114,6 +115,14 @@ export const router = createBrowserRouter([
             element: (
               <Suspense fallback={<Loading />}>
                 <FinanceiroDashboardPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: '/profissionais',
+            element: (
+              <Suspense fallback={<Loading />}>
+                <ProfissionaisPage />
               </Suspense>
             ),
           },

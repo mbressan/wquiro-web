@@ -4,12 +4,20 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { PatientCreate, PatientDetail } from '@/types/patient';
 
+function formatPhone(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  if (digits.length <= 2) return digits.length ? `(${digits}` : '';
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+}
+
 const schema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
   phone: z.string().min(1, 'Telefone é obrigatório'),
   email: z.string().email('E-mail inválido').optional().or(z.literal('')),
   cpf: z.string().optional(),
-  date_of_birth: z.string().optional(),
+  date_of_birth: z.string().min(1, 'Data de nascimento é obrigatória'),
   gender: z.enum(['M', 'F', 'O', 'N']).optional(),
   address: z.string().optional(),
   city: z.string().optional(),
@@ -43,6 +51,7 @@ export function PatientForm({
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -52,6 +61,7 @@ export function PatientForm({
     if (defaultValues) {
       reset({
         ...defaultValues,
+        phone: formatPhone(defaultValues.phone),
         date_of_birth: defaultValues.date_of_birth ?? undefined,
         tags: defaultValues.tags.map((t) => t.name).join(', '),
       });
@@ -66,7 +76,12 @@ export function PatientForm({
           .map((t) => t.trim())
           .filter(Boolean)
       : [];
-    onSubmit({ ...rest, tags: tagList } as PatientCreate);
+    const payload: PatientCreate = { ...rest, tags: tagList };
+    // Strip empty strings from optional fields — backend rejects "" as invalid value
+    (Object.keys(payload) as (keyof PatientCreate)[]).forEach((key) => {
+      if (key !== 'date_of_birth' && payload[key] === '') delete payload[key];
+    });
+    onSubmit(payload);
   }
 
   return (
@@ -95,6 +110,13 @@ export function PatientForm({
           </label>
           <input
             {...register('phone')}
+            placeholder="(11) 99999-9999"
+            maxLength={15}
+            onChange={(e) => {
+              const formatted = formatPhone(e.target.value);
+              e.target.value = formatted;
+              setValue('phone', formatted, { shouldValidate: true });
+            }}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
           />
           {errors.phone && (
@@ -124,12 +146,17 @@ export function PatientForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Data de Nascimento</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Data de Nascimento <span className="text-red-500">*</span>
+          </label>
           <input
             {...register('date_of_birth')}
             type="date"
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
           />
+          {errors.date_of_birth && (
+            <p className="mt-1 text-xs text-red-600">{errors.date_of_birth.message}</p>
+          )}
         </div>
 
         <div>
