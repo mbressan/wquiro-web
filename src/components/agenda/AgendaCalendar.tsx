@@ -12,6 +12,7 @@ interface AgendaCalendarProps {
   appointments: Appointment[];
   professionals: Professional[];
   viewMode: ViewMode;
+  backgroundEvents?: object[];
   onDateClick?: (date: string) => void;
   onEventClick?: (appointment: Appointment) => void;
   onEventDrop?: (appointmentId: string, newStart: string, newEnd: string, revert: () => void) => void;
@@ -21,6 +22,7 @@ export function AgendaCalendar({
   appointments,
   professionals,
   viewMode,
+  backgroundEvents = [],
   onDateClick,
   onEventClick,
   onEventDrop,
@@ -31,15 +33,18 @@ export function AgendaCalendar({
     eventColor: p.color,
   }));
 
-  const events = appointments.map((a) => ({
-    id: a.id,
-    resourceId: a.resourceId,
-    title: a.title,
-    start: a.start,
-    end: a.end,
-    backgroundColor: professionals.find((p) => p.id === a.professional)?.color ?? '#3b82f6',
-    extendedProps: { ...a.extendedProps, _appointment: a },
-  }));
+  const events = [
+    ...appointments.map((a) => ({
+      id: a.id,
+      resourceId: a.resourceId,
+      title: a.title,
+      start: a.start,
+      end: a.end,
+      backgroundColor: professionals.find((p) => p.id === a.professional)?.color ?? '#3b82f6',
+      extendedProps: { ...a.extendedProps, _appointment: a },
+    })),
+    ...backgroundEvents,
+  ];
 
   return (
     <div className="rounded-lg border bg-white p-2 shadow-sm overflow-auto">

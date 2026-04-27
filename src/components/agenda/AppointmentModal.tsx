@@ -1,9 +1,12 @@
 
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useProfessionals, useSlots } from '@/hooks/useProfessionals';
 import { useSessionPackages } from '@/hooks/useAppointments';
+import { usePatients } from '@/hooks/usePatients';
+import { PatientQuickCreate } from './PatientQuickCreate';
 import type { AppointmentCreate } from '@/types/appointment';
 
 const schema = z
@@ -40,10 +43,12 @@ export function AppointmentModal({
   error,
   onClose,
 }: AppointmentModalProps) {
+  const [showQuickCreate, setShowQuickCreate] = useState(false);
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -60,6 +65,8 @@ export function AppointmentModal({
   const { data: professionals } = useProfessionals();
   useSlots(professional, date);
   const { data: packages } = useSessionPackages(patientId);
+  const { data: patientsData } = usePatients();
+  const patients = patientsData?.results ?? [];
 
   function handleFormSubmit(values: FormData) {
     const payload: AppointmentCreate = {
@@ -72,6 +79,11 @@ export function AppointmentModal({
       session_package: values.session_package || undefined,
     };
     onSubmit(payload);
+  }
+
+  function handlePatientCreated(patientId: string) {
+    setValue('patient', patientId);
+    setShowQuickCreate(false);
   }
 
   return (
@@ -87,6 +99,45 @@ export function AppointmentModal({
         )}
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-3">
+          {/* Patient */}
+          <div>
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium text-gray-700">Paciente *</label>
+              {!showQuickCreate && (
+                <button
+                  type="button"
+                  onClick={() => setShowQuickCreate(true)}
+                  className="text-xs text-indigo-600 hover:underline"
+                >
+                  + Novo paciente
+                </button>
+              )}
+            </div>
+            {showQuickCreate ? (
+              <PatientQuickCreate
+                onCreated={(id) => handlePatientCreated(id)}
+                onCancel={() => setShowQuickCreate(false)}
+              />
+            ) : (
+              <>
+                <select
+                  {...register('patient')}
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                >
+                  <option value="">Selecione...</option>
+                  {patients.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.patient && (
+                  <p className="text-xs text-red-600">{errors.patient.message}</p>
+                )}
+              </>
+            )}
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700">Profissional *</label>
             <select
