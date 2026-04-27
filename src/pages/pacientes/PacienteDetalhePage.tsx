@@ -1,14 +1,32 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Download, Phone, Mail, MapPin, CalendarDays, FileText, Activity, ChevronRight } from 'lucide-react';
-import { usePatient } from '@/hooks/usePatients';
+import { toast } from 'sonner';
+import { usePatient, useUpdatePatient } from '@/hooks/usePatients';
+import { PatientForm } from '@/components/pacientes/PatientForm';
 import { PatientTimeline } from '@/components/pacientes/PatientTimeline';
 import { TagBadge } from '@/components/pacientes/TagBadge';
-import { PageHeaderBack, PageContainer } from '@/components/ui';
+import { Button, Modal, PageHeaderBack, PageContainer } from '@/components/ui';
+import type { PatientCreate } from '@/types/patient';
 
 export default function PacienteDetalhePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: patient, isLoading } = usePatient(id!);
+  const updatePatient = useUpdatePatient(id!);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  function handleUpdate(data: PatientCreate) {
+    updatePatient.mutate(data, {
+      onSuccess: () => {
+        setShowEditModal(false);
+        toast.success('Paciente atualizado com sucesso!');
+      },
+      onError: () => {
+        toast.error('Erro ao atualizar paciente.');
+      },
+    });
+  }
 
   if (isLoading) {
     return (
@@ -63,15 +81,20 @@ export default function PacienteDetalhePage() {
           ) : undefined
         }
         actions={
-          <a
-            href={`/api/v1/pacientes/${patient.id}/export/`}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
-          >
-            <Download className="h-4 w-4" />
-            Exportar LGPD
-          </a>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="secondary" onClick={() => setShowEditModal(true)}>
+              Editar
+            </Button>
+            <a
+              href={`/api/v1/pacientes/${patient.id}/export/`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
+            >
+              <Download className="h-4 w-4" />
+              Exportar LGPD
+            </a>
+          </div>
         }
       />
 
@@ -173,6 +196,18 @@ export default function PacienteDetalhePage() {
           </div>
         </div>
       </div>
+
+      {showEditModal && (
+        <Modal title="Editar Paciente" onClose={() => setShowEditModal(false)} size="lg">
+          <PatientForm
+            defaultValues={patient}
+            onSubmit={handleUpdate}
+            isLoading={updatePatient.isPending}
+            error={updatePatient.isError ? 'Erro ao salvar. Verifique os dados.' : null}
+            onCancel={() => setShowEditModal(false)}
+          />
+        </Modal>
+      )}
     </PageContainer>
   );
 }
