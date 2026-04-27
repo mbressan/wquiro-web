@@ -1,4 +1,4 @@
-import type { Professional } from '@/types/professional';
+import type { Professional, SpecialtyRef } from '@/types/professional';
 
 interface ProfessionalTableProps {
   professionals: Professional[];
@@ -90,7 +90,7 @@ export function ProfessionalTable({
   );
 }
 
-function SpecialtiesBadges({ specialties }: { specialties: string[] }) {
+function SpecialtiesBadges({ specialties }: { specialties: SpecialtyRef[] }) {
   if (!specialties || specialties.length === 0) return <span className="text-gray-400">—</span>;
 
   const visible = specialties.slice(0, 2);
@@ -100,10 +100,10 @@ function SpecialtiesBadges({ specialties }: { specialties: string[] }) {
     <div className="flex flex-wrap gap-1">
       {visible.map((s) => (
         <span
-          key={s}
+          key={s.id}
           className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700"
         >
-          {s}
+          {s.name}
         </span>
       ))}
       {extra > 0 && (

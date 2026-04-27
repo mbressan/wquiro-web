@@ -8,12 +8,15 @@ import {
   useResendInvite,
   useCancelInvite,
 } from '@/hooks/useProfessionals';
+import { useSpecialties, useDeactivateSpecialty } from '@/hooks/useSpecialties';
 import { ProfessionalTable } from '@/components/profissionais/ProfessionalTable';
 import { ProfessionalModal } from '@/components/profissionais/ProfessionalModal';
 import { InviteModal } from '@/components/profissionais/InviteModal';
-import type { Professional, TeamInvite } from '@/types/professional';
+import { SpecialtyTable } from '@/components/profissionais/SpecialtyTable';
+import { SpecialtyModal } from '@/components/profissionais/SpecialtyModal';
+import type { Professional, Specialty, TeamInvite } from '@/types/professional';
 
-type Tab = 'ativos' | 'inativos' | 'convites';
+type Tab = 'ativos' | 'inativos' | 'convites' | 'especialidades';
 
 function InviteStatusBadge({ invite }: { invite: TeamInvite }) {
   if (invite.accepted_at) {
@@ -52,14 +55,18 @@ export default function ProfissionaisPage() {
   const [selectedProfessional, setSelectedProfessional] = useState<Professional | undefined>();
   const [showProfessionalModal, setShowProfessionalModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [selectedSpecialty, setSelectedSpecialty] = useState<Specialty | undefined>();
+  const [showSpecialtyModal, setShowSpecialtyModal] = useState(false);
 
   const activeQuery = useProfessionalsAdmin({ is_active: true, role: 'professional' });
   const inactiveQuery = useProfessionalsAdmin({ is_active: false, role: 'professional' });
   const invitesQuery = useInvites();
+  const specialtiesQuery = useSpecialties();
 
   const deactivate = useDeactivateProfessional();
   const resendInvite = useResendInvite();
   const cancelInvite = useCancelInvite();
+  const deactivateSpecialty = useDeactivateSpecialty();
 
   function openCreate() {
     setSelectedProfessional(undefined);
@@ -99,10 +106,35 @@ export default function ProfissionaisPage() {
     }
   }
 
+  function openCreateSpecialty() {
+    setSelectedSpecialty(undefined);
+    setShowSpecialtyModal(true);
+  }
+
+  function openEditSpecialty(s: Specialty) {
+    setSelectedSpecialty(s);
+    setShowSpecialtyModal(true);
+  }
+
+  async function handleDeactivateSpecialty(id: string) {
+    try {
+      await deactivateSpecialty.mutateAsync(id);
+      toast.success('Especialidade desativada.');
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { status?: number; data?: { detail?: string } } };
+      if (axiosErr?.response?.status === 400) {
+        toast.error(axiosErr.response?.data?.detail ?? 'Não é possível desativar esta especialidade.');
+      } else {
+        toast.error('Erro ao desativar especialidade.');
+      }
+    }
+  }
+
   const tabs: { id: Tab; label: string }[] = [
     { id: 'ativos', label: 'Ativos' },
     { id: 'inativos', label: 'Inativos' },
     { id: 'convites', label: 'Convites' },
+    { id: 'especialidades', label: 'Especialidades' },
   ];
 
   return (
@@ -115,18 +147,29 @@ export default function ProfissionaisPage() {
         </div>
         {isAdmin && (
           <div className="flex gap-3">
-            <button
-              onClick={() => setShowInviteModal(true)}
-              className="rounded-md border border-blue-600 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50"
-            >
-              Convidar
-            </button>
-            <button
-              onClick={openCreate}
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-            >
-              Novo Profissional
-            </button>
+            {activeTab === 'especialidades' ? (
+              <button
+                onClick={openCreateSpecialty}
+                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              >
+                Nova Especialidade
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => setShowInviteModal(true)}
+                  className="rounded-md border border-blue-600 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50"
+                >
+                  Convidar
+                </button>
+                <button
+                  onClick={openCreate}
+                  className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                >
+                  Novo Profissional
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -252,6 +295,21 @@ export default function ProfissionaisPage() {
         </>
       )}
 
+      {activeTab === 'especialidades' && (
+        <>
+          {specialtiesQuery.isLoading ? (
+            <p className="text-sm text-gray-500">Carregando...</p>
+          ) : (
+            <SpecialtyTable
+              specialties={specialtiesQuery.data ?? []}
+              onEdit={openEditSpecialty}
+              onDeactivate={handleDeactivateSpecialty}
+              isAdmin={isAdmin}
+            />
+          )}
+        </>
+      )}
+
       {/* Modals */}
       <ProfessionalModal
         professional={selectedProfessional}
@@ -268,6 +326,15 @@ export default function ProfissionaisPage() {
         open={showInviteModal}
         onOpenChange={setShowInviteModal}
         onSuccess={() => {}}
+      />
+
+      <SpecialtyModal
+        specialty={selectedSpecialty}
+        open={showSpecialtyModal}
+        onOpenChange={setShowSpecialtyModal}
+        onSuccess={() => {
+          toast.success(selectedSpecialty ? 'Especialidade atualizada.' : 'Especialidade criada.');
+        }}
       />
     </div>
   );

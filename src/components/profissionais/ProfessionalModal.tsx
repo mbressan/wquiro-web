@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { Professional, ProfessionalCreate, ProfessionalUpdate } from '@/types/professional';
 import { useCreateProfessional, useUpdateProfessional } from '@/hooks/useProfessionals';
+import { useSpecialties, useSetProfessionalSpecialties } from '@/hooks/useSpecialties';
 
 const schema = z.object({
   name: z.string().min(2, 'Nome deve ter ao menos 2 caracteres'),
@@ -35,13 +36,14 @@ export function ProfessionalModal({
   onSuccess,
 }: ProfessionalModalProps) {
   const isEdit = !!professional;
-  const [specialties, setSpecialties] = useState<string[]>(professional?.specialties ?? []);
-  const [specialtyInput, setSpecialtyInput] = useState('');
+  const [selectedSpecialtyIds, setSelectedSpecialtyIds] = useState<string[]>([]);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const create = useCreateProfessional();
   const update = useUpdateProfessional();
-  const isLoading = create.isPending || update.isPending;
+  const setSpecialties = useSetProfessionalSpecialties();
+  const { data: availableSpecialties = [] } = useSpecialties();
+  const isLoading = create.isPending || update.isPending || setSpecialties.isPending;
 
   const {
     register,
@@ -62,49 +64,43 @@ export function ProfessionalModal({
         commission_percentage: professional?.commission_percentage ?? null,
         notes: professional?.notes ?? '',
       });
-      setSpecialties(professional?.specialties ?? []);
-      setSpecialtyInput('');
+      setSelectedSpecialtyIds(professional?.specialties?.map((s) => s.id) ?? []);
       setServerError(null);
     }
   }, [open, professional, reset]);
 
-  function addSpecialty() {
-    const trimmed = specialtyInput.trim();
-    if (!trimmed) return;
-    if (!specialties.map((s) => s.toLowerCase()).includes(trimmed.toLowerCase())) {
-      setSpecialties((prev) => [...prev, trimmed]);
-    }
-    setSpecialtyInput('');
-  }
-
-  function removeSpecialty(s: string) {
-    setSpecialties((prev) => prev.filter((x) => x !== s));
+  function toggleSpecialty(id: string) {
+    setSelectedSpecialtyIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
   }
 
   async function onSubmit(values: FormData) {
     setServerError(null);
     try {
+      let savedId: string;
       if (isEdit && professional) {
         const payload: ProfessionalUpdate = {
           name: values.name,
           phone: values.phone || '',
-          specialties,
           commission_percentage: values.commission_percentage ?? null,
           notes: values.notes ?? '',
         };
         await update.mutateAsync({ id: professional.id, data: payload });
+        savedId = professional.id;
       } else {
         const payload: ProfessionalCreate = {
           name: values.name!,
           email: values.email!,
           role: 'professional',
           phone: values.phone || '',
-          specialties,
           commission_percentage: values.commission_percentage ?? null,
           notes: values.notes ?? '',
         };
-        await create.mutateAsync(payload);
+        const created = await create.mutateAsync(payload);
+        savedId = created.id;
       }
+      await setSpecialties.mutateAsync({ userId: savedId, specialtyIds: selectedSpecialtyIds });
       onSuccess();
       onOpenChange(false);
     } catch (err: unknown) {
@@ -195,45 +191,30 @@ export function ProfessionalModal({
           {/* Specialties */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">Especialidades</label>
-            <div className="flex gap-2">
-              <input
-                value={specialtyInput}
-                onChange={(e) => setSpecialtyInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addSpecialty();
-                  }
-                }}
-                className="flex-1 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Digite e pressione Enter"
-              />
-              <button
-                type="button"
-                onClick={addSpecialty}
-                className="rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
-              >
-                Adicionar
-              </button>
-            </div>
-            {specialties.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-1">
-                {specialties.map((s) => (
-                  <span
-                    key={s}
-                    className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700"
-                  >
-                    {s}
-                    <button
-                      type="button"
-                      onClick={() => removeSpecialty(s)}
-                      className="ml-0.5 rounded-full text-blue-500 hover:text-blue-700"
-                    >
-                      ×
-                    </button>
-                  </span>
+            {availableSpecialties.length === 0 ? (
+              <p className="text-xs text-gray-400">Carregando especialidades…</p>
+            ) : (
+              <div className="max-h-36 overflow-y-auto rounded-md border border-gray-300 p-2">
+                {availableSpecialties.map((s) => (
+                  <label key={s.id} className="flex cursor-pointer items-center gap-2 rounded px-1 py-1 text-sm hover:bg-gray-50">
+                    <input
+                      type="checkbox"
+                      checked={selectedSpecialtyIds.includes(s.id)}
+                      onChange={() => toggleSpecialty(s.id)}
+                      className="h-4 w-4 rounded border-gray-300 text-blue-600"
+                    />
+                    <span className="text-gray-800">{s.name}</span>
+                    {s.is_predefined && (
+                      <span className="ml-auto text-xs text-purple-500">pré-definida</span>
+                    )}
+                  </label>
                 ))}
               </div>
+            )}
+            {selectedSpecialtyIds.length > 0 && (
+              <p className="mt-1 text-xs text-gray-500">
+                {selectedSpecialtyIds.length} selecionada(s)
+              </p>
             )}
           </div>
 

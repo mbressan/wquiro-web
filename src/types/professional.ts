@@ -1,5 +1,31 @@
 export type ProfessionalRole = 'admin' | 'professional' | 'receptionist';
 
+export interface SpecialtyRef {
+  id: string;
+  name: string;
+  is_predefined: boolean;
+}
+
+export interface Specialty {
+  id: string;
+  name: string;
+  description: string;
+  is_active: boolean;
+  is_predefined: boolean;
+  professionals_count: number;
+  created_at: string;
+}
+
+export interface SpecialtyCreate {
+  name: string;
+  description?: string;
+}
+
+export interface SpecialtyUpdate {
+  name?: string;
+  description?: string;
+}
+
 export interface Professional {
   id: string;
   name: string;
@@ -7,7 +33,7 @@ export interface Professional {
   phone: string;
   role: ProfessionalRole;
   is_active: boolean;
-  specialties: string[];
+  specialties: SpecialtyRef[];
   commission_percentage: number | null;
   notes: string;
   created_at: string;
@@ -19,7 +45,6 @@ export interface ProfessionalCreate {
   email: string;
   role: ProfessionalRole;
   phone?: string;
-  specialties?: string[];
   commission_percentage?: number | null;
   notes?: string;
 }
@@ -27,7 +52,6 @@ export interface ProfessionalCreate {
 export interface ProfessionalUpdate {
   name?: string;
   phone?: string;
-  specialties?: string[];
   commission_percentage?: number | null;
   notes?: string;
   is_active?: boolean;
@@ -37,7 +61,7 @@ export interface ProfessionalFilters {
   role?: ProfessionalRole;
   is_active?: boolean;
   search?: string;
-  specialties?: string;
+  specialty?: string;
 }
 
 export interface TeamInvite {
