@@ -1,7 +1,7 @@
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button } from '@/components/ui';
+import { Button, FormField, Input, Textarea, Select } from '@/components/ui';
 import { PainScaleEVA } from './PainScaleEVA';
 import { PainBodyMap } from './PainBodyMap';
 import { SpineMapCanvas } from './SpineMapCanvas';
@@ -57,60 +57,74 @@ interface AnamnesisFormProps {
   onPosturalAssessmentChange?: (value: PosturalAssessment) => void;
 }
 
-export function AnamnesisForm({ defaultValues, onSubmit, isLoading, posturalAssessment, onPosturalAssessmentChange }: AnamnesisFormProps) {
+function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div className="border-b border-gray-100 px-5 py-3">
+        <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+      </div>
+      <div className="px-5 py-4 space-y-3">{children}</div>
+    </div>
+  );
+}
+
+const SOAP_LABELS: Record<string, string> = {
+  subjective: 'Subjetivo (S)',
+  objective: 'Objetivo (O)',
+  assessment: 'Avaliação (A)',
+  plan: 'Plano (P)',
+};
+
+export function AnamnesisForm({
+  defaultValues,
+  onSubmit,
+  isLoading,
+  posturalAssessment,
+  onPosturalAssessmentChange,
+}: AnamnesisFormProps) {
   const { register, handleSubmit, control } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: defaultValues ?? {},
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <section className="space-y-3">
-        <h3 className="text-sm font-semibold text-gray-800">Queixa e História</h3>
-        <div>
-          <label className="block text-xs font-medium text-gray-600">Queixa Principal</label>
-          <input {...register('chief_complaint')} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-gray-600">HMA (História da Moléstia Atual)</label>
-          <textarea {...register('hma')} rows={3} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
-        </div>
-        <div>
-          <label className="block text-xs font-medium text-gray-600">Antecedentes Pessoais</label>
-          <textarea {...register('past_history')} rows={2} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
-        </div>
+    <form onSubmit={handleSubmit(onSubmit)} className="divide-y divide-gray-100">
+      <SectionCard title="Queixa e História">
+        <FormField label="Queixa Principal">
+          <Input {...register('chief_complaint')} />
+        </FormField>
+        <FormField label="HMA (História da Moléstia Atual)">
+          <Textarea {...register('hma')} rows={3} />
+        </FormField>
+        <FormField label="Antecedentes Pessoais">
+          <Textarea {...register('past_history')} rows={2} />
+        </FormField>
         <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-medium text-gray-600">Ocupação</label>
-            <input {...register('occupation')} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600">Atividade Física</label>
-            <input {...register('physical_activity')} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
-          </div>
+          <FormField label="Ocupação">
+            <Input {...register('occupation')} />
+          </FormField>
+          <FormField label="Atividade Física">
+            <Input {...register('physical_activity')} />
+          </FormField>
         </div>
-        <div>
-          <label className="block text-xs font-medium text-gray-600">Medicamentos</label>
-          <input {...register('medications')} placeholder="Separar por vírgula" className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
-        </div>
+        <FormField label="Medicamentos">
+          <Input {...register('medications')} placeholder="Separar por vírgula" />
+        </FormField>
         <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-medium text-gray-600">Início</label>
-            <select {...register('onset')} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500">
+          <FormField label="Início">
+            <Select {...register('onset')}>
               <option value="">—</option>
               <option value="gradual">Gradual</option>
               <option value="sudden">Súbito</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600">Data de Início</label>
-            <input type="date" {...register('onset_date')} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
-          </div>
+            </Select>
+          </FormField>
+          <FormField label="Data de Início">
+            <Input type="date" {...register('onset_date')} />
+          </FormField>
         </div>
-      </section>
+      </SectionCard>
 
-      <section className="space-y-3">
-        <h3 className="text-sm font-semibold text-gray-800">Avaliação Clínica</h3>
+      <SectionCard title="Avaliação Clínica">
         <Controller
           control={control}
           name="pain_scale"
@@ -133,44 +147,40 @@ export function AnamnesisForm({ defaultValues, onSubmit, isLoading, posturalAsse
           render={({ field }) => {
             const spineData: SpineMapData = spineDataToUI(field.value);
             return (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Mapa de Coluna — Vértebras Ajustadas
-                </label>
+              <FormField label="Mapa de Coluna — Vértebras Ajustadas">
                 <SpineMapCanvas
                   selected={spineData.adjusted}
                   techniques={spineData.techniques}
                   onChange={(data) => field.onChange(uiToSpinePayload(data))}
                 />
-              </div>
+              </FormField>
             );
           }}
         />
-      </section>
+      </SectionCard>
 
-      <section className="space-y-3">
-        <h3 className="text-sm font-semibold text-gray-800">SOAP</h3>
+      <SectionCard title="SOAP">
         {(['subjective', 'objective', 'assessment', 'plan'] as const).map((f) => (
-          <div key={f}>
-            <label className="block text-xs font-medium text-gray-600 capitalize">{f}</label>
-            <textarea {...register(f)} rows={2} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
-          </div>
+          <FormField key={f} label={SOAP_LABELS[f]}>
+            <Textarea {...register(f)} rows={2} />
+          </FormField>
         ))}
-      </section>
+      </SectionCard>
 
       {onPosturalAssessmentChange && (
-        <div className="mt-6">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Avaliação Postural</h3>
+        <SectionCard title="Avaliação Postural">
           <PosturalAssessmentForm
             value={posturalAssessment ?? emptyPosturalAssessment()}
             onChange={onPosturalAssessmentChange}
           />
-        </div>
+        </SectionCard>
       )}
 
-      <Button type="submit" loading={isLoading} className="w-full">
-        Salvar Prontuário
-      </Button>
+      <div className="px-5 py-4">
+        <Button type="submit" loading={isLoading} className="w-full">
+          Salvar Prontuário
+        </Button>
+      </div>
     </form>
   );
 }

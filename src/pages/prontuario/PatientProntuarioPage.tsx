@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { FileText, ChevronRight, AlertCircle } from 'lucide-react';
 import { usePatientRecords } from '@/hooks/useRecords';
-import { PageHeaderBack, StatusBadge } from '@/components/ui';
+import { PageHeaderBack, StatusBadge, PageContainer } from '@/components/ui';
 import type { ClinicalRecordListItem } from '@/types/record';
 
 function RecordCard({ record }: { record: ClinicalRecordListItem }) {
@@ -50,7 +50,7 @@ export default function PatientProntuarioPage() {
   const { data: records, isLoading, isError } = usePatientRecords(patientId);
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-6 space-y-6">
+    <PageContainer size="sm">
       <PageHeaderBack title="Prontuários" onBack={() => navigate(-1)} />
 
       {isLoading && (
@@ -79,6 +79,6 @@ export default function PatientProntuarioPage() {
           ))}
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

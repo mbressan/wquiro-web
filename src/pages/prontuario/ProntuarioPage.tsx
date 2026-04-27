@@ -96,7 +96,7 @@ export default function ProntuarioPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-xl border p-6 shadow-sm">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             {record.record_type === 'anamnesis' ? (
               <AnamnesisForm
                 defaultValues={{
@@ -138,20 +138,29 @@ export default function ProntuarioPage() {
           </div>
 
           {showPosturalForm && record.record_type === 'reevaluation' && (
-            <div className="bg-white rounded-xl border p-6 shadow-sm">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">Avaliação Postural</h3>
-              <PosturalAssessmentForm
-                value={resolvedPostural ?? emptyPosturalAssessment()}
-                onChange={setPosturalAssessment}
-              />
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="border-b border-gray-100 px-5 py-3">
+                <h3 className="text-sm font-semibold text-gray-900">Avaliação Postural</h3>
+              </div>
+              <div className="p-5">
+                <PosturalAssessmentForm
+                  value={resolvedPostural ?? emptyPosturalAssessment()}
+                  onChange={setPosturalAssessment}
+                />
+              </div>
             </div>
           )}
         </div>
 
         <div className="space-y-4">
           <PatientHistoryPanel patientId={record.patient} currentRecordId={record.id} />
-          <div className="bg-white rounded-xl border p-4 shadow-sm">
-            <ExamUpload recordId={record.id} exams={record.exam_files} />
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="border-b border-gray-100 px-4 py-3">
+              <h3 className="text-sm font-semibold text-gray-900">Exames</h3>
+            </div>
+            <div className="p-4">
+              <ExamUpload recordId={record.id} exams={record.exam_files} />
+            </div>
           </div>
         </div>
       </div>
