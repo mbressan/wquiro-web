@@ -21,6 +21,7 @@ const PacienteDetalhePage = lazy(() => import('@/pages/pacientes/PacienteDetalhe
 const AgendaPage = lazy(() => import('@/pages/agenda/AgendaPage'))
 const ProntuarioPage = lazy(() => import('@/pages/prontuario/ProntuarioPage'))
 const PatientProntuarioPage = lazy(() => import('@/pages/prontuario/PatientProntuarioPage'))
+const PatientConsultasPage = lazy(() => import('@/pages/pacientes/PatientConsultasPage'))
 const CaixaPage = lazy(() => import('@/pages/financeiro/CaixaPage'))
 const FinanceiroDashboardPage = lazy(() => import('@/pages/financeiro/FinanceiroDashboardPage'))
 const ProfissionaisPage = lazy(() => import('@/pages/profissionais/ProfissionaisPage'))
@@ -92,6 +93,14 @@ export const router = createBrowserRouter([
             element: (
               <Suspense fallback={<Loading />}>
                 <AgendaPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: '/pacientes/:patientId/consultas',
+            element: (
+              <Suspense fallback={<Loading />}>
+                <PatientConsultasPage />
               </Suspense>
             ),
           },
