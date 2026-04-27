@@ -48,6 +48,7 @@ export interface Appointment {
   status: AppointmentStatus;
   scheduled_at: string;
   end_at: string;
+  clinical_record_id: string | null;
   booking_fee_required: boolean;
   booking_fee_paid: boolean;
   booking_fee_amount: string | null;

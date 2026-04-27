@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { CalendarDays, ChevronRight, AlertCircle, FileText } from 'lucide-react';
-import { useAppointments } from '@/hooks/useAppointments';
+import { CalendarDays, ChevronRight, AlertCircle, FileText, Play } from 'lucide-react';
+import { toast } from 'sonner';
+import { useAppointments, useCheckin } from '@/hooks/useAppointments';
 import type { Appointment } from '@/types/appointment';
 
 const STATUS_LABELS: Record<string, string> = {
@@ -29,7 +30,17 @@ const TYPE_LABELS: Record<string, string> = {
 
 function AppointmentCard({ appt }: { appt: Appointment }) {
   const navigate = useNavigate();
+  const checkin = useCheckin(appt.id);
   const date = new Date(appt.scheduled_at);
+
+  function handleCheckin() {
+    checkin.mutate(undefined, {
+      onSuccess: (data) => {
+        navigate(`/prontuario/${data.clinical_record_id}`, { state: { from: 'agenda' } });
+      },
+      onError: () => toast.error('Erro ao iniciar atendimento.'),
+    });
+  }
 
   return (
     <div className="flex items-center justify-between rounded-lg border bg-white p-4 shadow-sm">
@@ -64,9 +75,9 @@ function AppointmentCard({ appt }: { appt: Appointment }) {
           <p className="text-sm text-gray-500">{appt.professional_name}</p>
         </div>
       </div>
-      {appt.status === 'completed' && (
+      {appt.status === 'completed' && appt.clinical_record_id && (
         <button
-          onClick={() => navigate(`/prontuario/${appt.id}`)}
+          onClick={() => navigate(`/prontuario/${appt.clinical_record_id}`)}
           className="flex items-center gap-1 rounded-md border px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50"
           title="Ver prontuário"
         >
@@ -74,8 +85,26 @@ function AppointmentCard({ appt }: { appt: Appointment }) {
           Prontuário
         </button>
       )}
-      {appt.status !== 'completed' && (
-        <ChevronRight className="h-5 w-5 flex-shrink-0 text-gray-300" />
+      {appt.status === 'scheduled' && (
+        <button
+          onClick={handleCheckin}
+          disabled={checkin.isPending}
+          className="flex items-center gap-1 rounded-md bg-green-600 px-3 py-1.5 text-xs text-white hover:bg-green-700 disabled:opacity-60"
+          title="Iniciar atendimento"
+        >
+          <Play className="h-3.5 w-3.5" />
+          {checkin.isPending ? 'Iniciando...' : 'Iniciar'}
+        </button>
+      )}
+      {appt.status === 'in_progress' && appt.clinical_record_id && (
+        <button
+          onClick={() => navigate(`/prontuario/${appt.clinical_record_id}`, { state: { from: 'agenda' } })}
+          className="flex items-center gap-1 rounded-md bg-purple-600 px-3 py-1.5 text-xs text-white hover:bg-purple-700"
+          title="Continuar atendimento"
+        >
+          <ChevronRight className="h-3.5 w-3.5" />
+          Continuar
+        </button>
       )}
     </div>
   );
