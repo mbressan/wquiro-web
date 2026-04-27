@@ -3,8 +3,29 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { Professional, ProfessionalCreate, ProfessionalUpdate } from '@/types/professional';
-import { useCreateProfessional, useUpdateProfessional } from '@/hooks/useProfessionals';
+import { useCreateProfessional, useUpdateProfessional, useProfessionalsAdmin } from '@/hooks/useProfessionals';
 import { useSpecialties, useSetProfessionalSpecialties } from '@/hooks/useSpecialties';
+
+const PROFESSIONAL_COLORS = [
+  { hex: '#3b82f6', label: 'Azul' },
+  { hex: '#ef4444', label: 'Vermelho' },
+  { hex: '#10b981', label: 'Verde' },
+  { hex: '#f59e0b', label: 'Âmbar' },
+  { hex: '#8b5cf6', label: 'Roxo' },
+  { hex: '#ec4899', label: 'Rosa' },
+  { hex: '#06b6d4', label: 'Ciano' },
+  { hex: '#f97316', label: 'Laranja' },
+  { hex: '#64748b', label: 'Cinza-azul' },
+  { hex: '#84cc16', label: 'Verde-lima' },
+] as const;
+
+function getNextColor(professionals: { color: string }[]): string {
+  const usedColors = new Set(professionals.map((p) => p.color));
+  return (
+    PROFESSIONAL_COLORS.find(({ hex }) => !usedColors.has(hex))?.hex ??
+    PROFESSIONAL_COLORS[0].hex
+  );
+}
 
 const schema = z.object({
   name: z.string().min(2, 'Nome deve ter ao menos 2 caracteres'),
@@ -18,6 +39,7 @@ const schema = z.object({
     .union([z.number().min(0, 'Mínimo 0').max(100, 'Máximo 100'), z.null()])
     .optional(),
   notes: z.string().optional(),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida').default('#3b82f6'),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -43,6 +65,8 @@ export function ProfessionalModal({
   const update = useUpdateProfessional();
   const setSpecialties = useSetProfessionalSpecialties();
   const { data: availableSpecialties = [] } = useSpecialties();
+  const { data: professionalsData } = useProfessionalsAdmin({ role: 'professional', is_active: true });
+  const activeProfessionals = professionalsData?.results ?? [];
   const isLoading = create.isPending || update.isPending || setSpecialties.isPending;
 
   const {
@@ -50,6 +74,8 @@ export function ProfessionalModal({
     handleSubmit,
     reset,
     setError,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -63,11 +89,12 @@ export function ProfessionalModal({
         phone: professional?.phone ?? '',
         commission_percentage: professional?.commission_percentage ?? null,
         notes: professional?.notes ?? '',
+        color: professional?.color ?? getNextColor(activeProfessionals),
       });
       setSelectedSpecialtyIds(professional?.specialties?.map((s) => s.id) ?? []);
       setServerError(null);
     }
-  }, [open, professional, reset]);
+  }, [open, professional, reset]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function toggleSpecialty(id: string) {
     setSelectedSpecialtyIds((prev) =>
@@ -85,6 +112,7 @@ export function ProfessionalModal({
           phone: values.phone || '',
           commission_percentage: values.commission_percentage ?? null,
           notes: values.notes ?? '',
+          color: values.color,
         };
         await update.mutateAsync({ id: professional.id, data: payload });
         savedId = professional.id;
@@ -96,6 +124,7 @@ export function ProfessionalModal({
           phone: values.phone || '',
           commission_percentage: values.commission_percentage ?? null,
           notes: values.notes ?? '',
+          color: values.color,
         };
         const created = await create.mutateAsync(payload);
         savedId = created.id;
@@ -246,6 +275,33 @@ export function ProfessionalModal({
               className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Notas internas..."
             />
+          </div>
+
+          {/* Color */}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Cor na agenda</label>
+            <div className="flex flex-wrap gap-2">
+              {PROFESSIONAL_COLORS.map(({ hex, label }) => (
+                <button
+                  key={hex}
+                  type="button"
+                  title={label}
+                  onClick={() => setValue('color', hex, { shouldValidate: true })}
+                  className={[
+                    'h-7 w-7 rounded-full border-2 transition-all',
+                    watch('color') === hex
+                      ? 'scale-110 border-gray-900 shadow-md'
+                      : 'border-transparent hover:border-gray-400',
+                  ].join(' ')}
+                  style={{ backgroundColor: hex }}
+                  aria-label={label}
+                  aria-pressed={watch('color') === hex}
+                />
+              ))}
+            </div>
+            {errors.color && (
+              <p className="mt-1 text-xs text-red-500">{errors.color.message}</p>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 border-t pt-4">

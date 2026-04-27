@@ -36,6 +36,7 @@ export interface Professional {
   specialties: SpecialtyRef[];
   commission_percentage: number | null;
   notes: string;
+  color: string;
   created_at: string;
   updated_at: string;
 }
@@ -47,6 +48,7 @@ export interface ProfessionalCreate {
   phone?: string;
   commission_percentage?: number | null;
   notes?: string;
+  color?: string;
 }
 
 export interface ProfessionalUpdate {
@@ -55,6 +57,7 @@ export interface ProfessionalUpdate {
   commission_percentage?: number | null;
   notes?: string;
   is_active?: boolean;
+  color?: string;
 }
 
 export interface ProfessionalFilters {
