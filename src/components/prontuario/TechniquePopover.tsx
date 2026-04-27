@@ -86,7 +86,7 @@ export function TechniquePopover({
             <button
               type="button"
               onClick={handleConfirm}
-              className="w-full bg-blue-600 text-white text-sm rounded px-3 py-1.5 hover:bg-blue-700 transition-colors"
+              className="w-full bg-primary-600 text-white text-sm rounded-lg px-3 py-1.5 hover:bg-primary-700 transition-colors"
             >
               Confirmar
             </button>

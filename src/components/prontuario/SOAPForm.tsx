@@ -1,4 +1,5 @@
 import { useForm, Controller } from 'react-hook-form';
+import { Input, Textarea, Button } from '@/components/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { PainScaleEVA } from './PainScaleEVA';
@@ -55,11 +56,11 @@ export function SOAPForm({ defaultValues, onSubmit, isLoading }: SOAPFormProps) 
         <h3 className="text-sm font-semibold text-gray-800">Evolução</h3>
         <div>
           <label className="block text-xs font-medium text-gray-600">Feedback do Paciente</label>
-          <textarea {...register('patient_feedback')} rows={2} className="mt-1 block w-full rounded-md border px-3 py-2 text-sm" />
+          <textarea {...register('patient_feedback')} rows={2} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-600">Técnicas Utilizadas</label>
-          <input {...register('techniques_used')} placeholder="Separar por vírgula" className="mt-1 block w-full rounded-md border px-3 py-2 text-sm" />
+          <input {...register('techniques_used')} placeholder="Separar por vírgula" className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
         </div>
       </section>
 
@@ -107,18 +108,14 @@ export function SOAPForm({ defaultValues, onSubmit, isLoading }: SOAPFormProps) 
         {(['subjective', 'objective', 'assessment', 'plan'] as const).map((f) => (
           <div key={f}>
             <label className="block text-xs font-medium text-gray-600 capitalize">{f}</label>
-            <textarea {...register(f)} rows={2} className="mt-1 block w-full rounded-md border px-3 py-2 text-sm" />
+            <textarea {...register(f)} rows={2} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
           </div>
         ))}
       </section>
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full rounded-md bg-blue-600 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
-      >
-        {isLoading ? 'Salvando...' : 'Salvar Evolução'}
-      </button>
+      <Button type="submit" loading={isLoading} className="w-full">
+        Salvar Evolução
+      </Button>
     </form>
   );
 }

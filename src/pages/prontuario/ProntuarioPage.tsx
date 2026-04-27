@@ -1,7 +1,7 @@
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { PageHeaderBack, StatusBadge, PageContainer } from '@/components/ui';
 import { useRecord, useUpdateRecord } from '@/hooks/useRecords';
 import { AnamnesisForm } from '@/components/prontuario/AnamnesisForm';
 import { SOAPForm } from '@/components/prontuario/SOAPForm';
@@ -11,12 +11,6 @@ import { PosturalAssessmentForm } from '@/components/prontuario/postural/Postura
 import { emptyPosturalAssessment } from '@/lib/posture-constants';
 import type { PosturalAssessment } from '@/types/posture';
 
-const RECORD_TYPE_LABELS: Record<string, string> = {
-  anamnesis: 'Anamnese',
-  follow_up: 'Retorno/Evolução',
-  reevaluation: 'Reavaliação',
-  discharge: 'Alta',
-};
 
 export default function ProntuarioPage() {
   const navigate = useNavigate();
@@ -92,24 +86,13 @@ export default function ProntuarioPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-6 space-y-8">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {location.state?.from === 'agenda' && (
-            <button
-              onClick={() => navigate('/agenda')}
-              className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Agenda
-            </button>
-          )}
-          <h1 className="text-2xl font-bold text-gray-900">Prontuário</h1>
-        </div>
-        <span className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600">
-          {RECORD_TYPE_LABELS[record.record_type] ?? record.record_type}
-        </span>
-      </div>
+    <PageContainer size="md">
+      <PageHeaderBack
+        title="Prontuário"
+        onBack={() => (location.state?.from === 'agenda' ? navigate('/agenda') : navigate(-1))}
+        backLabel={location.state?.from === 'agenda' ? 'Agenda' : 'Voltar'}
+        badge={<StatusBadge type="record" status={record.record_type as any} />}
+      />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
@@ -172,6 +155,6 @@ export default function ProntuarioPage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

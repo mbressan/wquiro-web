@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { FormField, Input, Select, Textarea, Button } from '@/components/ui';
 import type { PatientCreate, PatientDetail } from '@/types/patient';
 
 function formatPhone(value: string): string {
@@ -27,7 +28,7 @@ const schema = z.object({
   referred_by: z.string().optional(),
   notes: z.string().optional(),
   status: z.enum(['active', 'inactive']).optional(),
-  tags: z.string().optional(), // comma-separated tag names
+  tags: z.string().optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -40,22 +41,14 @@ interface PatientFormProps {
   onCancel?: () => void;
 }
 
-export function PatientForm({
-  defaultValues,
-  onSubmit,
-  isLoading,
-  error,
-  onCancel,
-}: PatientFormProps) {
+export function PatientForm({ defaultValues, onSubmit, isLoading, error, onCancel }: PatientFormProps) {
   const {
     register,
     handleSubmit,
     reset,
     setValue,
     formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-  });
+  } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   useEffect(() => {
     if (defaultValues) {
@@ -71,13 +64,9 @@ export function PatientForm({
   function handleFormSubmit(values: FormData) {
     const { tags, ...rest } = values;
     const tagList = tags
-      ? tags
-          .split(',')
-          .map((t) => t.trim())
-          .filter(Boolean)
+      ? tags.split(',').map((t) => t.trim()).filter(Boolean)
       : [];
     const payload: PatientCreate = { ...rest, tags: tagList };
-    // Strip empty strings from optional fields — backend rejects "" as invalid value
     (Object.keys(payload) as (keyof PatientCreate)[]).forEach((key) => {
       if (key !== 'date_of_birth' && payload[key] === '') delete payload[key];
     });
@@ -87,129 +76,72 @@ export function PatientForm({
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
       {error && (
-        <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>
+        <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
       )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Nome <span className="text-red-500">*</span>
-          </label>
-          <input
-            {...register('name')}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-          />
-          {errors.name && (
-            <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>
-          )}
-        </div>
+        <FormField id="name" label="Nome" required error={errors.name?.message}>
+          <Input id="name" {...register('name')} error={!!errors.name} />
+        </FormField>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Telefone <span className="text-red-500">*</span>
-          </label>
-          <input
+        <FormField id="phone" label="Telefone" required error={errors.phone?.message}>
+          <Input
+            id="phone"
             {...register('phone')}
             placeholder="(11) 99999-9999"
             maxLength={15}
+            error={!!errors.phone}
             onChange={(e) => {
               const formatted = formatPhone(e.target.value);
               e.target.value = formatted;
               setValue('phone', formatted, { shouldValidate: true });
             }}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
           />
-          {errors.phone && (
-            <p className="mt-1 text-xs text-red-600">{errors.phone.message}</p>
-          )}
-        </div>
+        </FormField>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">E-mail</label>
-          <input
-            {...register('email')}
-            type="email"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-          />
-          {errors.email && (
-            <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>
-          )}
-        </div>
+        <FormField id="email" label="E-mail" error={errors.email?.message}>
+          <Input id="email" type="email" {...register('email')} error={!!errors.email} />
+        </FormField>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">CPF</label>
-          <input
-            {...register('cpf')}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-            placeholder="000.000.000-00"
-          />
-        </div>
+        <FormField id="cpf" label="CPF">
+          <Input id="cpf" {...register('cpf')} placeholder="000.000.000-00" />
+        </FormField>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Data de Nascimento <span className="text-red-500">*</span>
-          </label>
-          <input
-            {...register('date_of_birth')}
-            type="date"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-          />
-          {errors.date_of_birth && (
-            <p className="mt-1 text-xs text-red-600">{errors.date_of_birth.message}</p>
-          )}
-        </div>
+        <FormField id="date_of_birth" label="Data de Nascimento" required error={errors.date_of_birth?.message}>
+          <Input id="date_of_birth" type="date" {...register('date_of_birth')} error={!!errors.date_of_birth} />
+        </FormField>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Gênero</label>
-          <select
-            {...register('gender')}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-          >
+        <FormField id="gender" label="Gênero">
+          <Select id="gender" {...register('gender')}>
             <option value="N">Não Informado</option>
             <option value="M">Masculino</option>
             <option value="F">Feminino</option>
             <option value="O">Outro</option>
-          </select>
+          </Select>
+        </FormField>
+
+        <div className="sm:col-span-2">
+          <FormField id="tags" label="Tags" hint="Separadas por vírgula">
+            <Input id="tags" {...register('tags')} placeholder="ex: convenio, fisioterapia" />
+          </FormField>
         </div>
 
         <div className="sm:col-span-2">
-          <label className="block text-sm font-medium text-gray-700">
-            Tags (separadas por vírgula)
-          </label>
-          <input
-            {...register('tags')}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-            placeholder="ex: convenio, fisioterapia"
-          />
-        </div>
-
-        <div className="sm:col-span-2">
-          <label className="block text-sm font-medium text-gray-700">Observações</label>
-          <textarea
-            {...register('notes')}
-            rows={3}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-          />
+          <FormField id="notes" label="Observações">
+            <Textarea id="notes" {...register('notes')} rows={3} />
+          </FormField>
         </div>
       </div>
 
       <div className="flex justify-end gap-3 pt-2">
         {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
+          <Button type="button" variant="secondary" onClick={onCancel}>
             Cancelar
-          </button>
+          </Button>
         )}
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {isLoading ? 'Salvando...' : 'Salvar'}
-        </button>
+        <Button type="submit" loading={isLoading}>
+          Salvar
+        </Button>
       </div>
     </form>
   );

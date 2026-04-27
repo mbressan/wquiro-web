@@ -25,6 +25,8 @@ const PatientConsultasPage = lazy(() => import('@/pages/pacientes/PatientConsult
 const CaixaPage = lazy(() => import('@/pages/financeiro/CaixaPage'))
 const FinanceiroDashboardPage = lazy(() => import('@/pages/financeiro/FinanceiroDashboardPage'))
 const ProfissionaisPage = lazy(() => import('@/pages/profissionais/ProfissionaisPage'))
+const PosturalHistoricoPage = lazy(() => import('@/pages/prontuario/PosturalHistoricoPage'))
+const ConfiguracoesPage = lazy(() => import('@/pages/configuracoes/ConfiguracoesPage'))
 
 const Loading = () => <div>Carregando...</div>
 

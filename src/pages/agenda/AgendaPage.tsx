@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus, CalendarX } from 'lucide-react';
+import { PageHeader, Button, PageContainer } from '@/components/ui';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAppointments, useCreateAppointment, APPOINTMENTS_KEY } from '@/hooks/useAppointments';
@@ -105,44 +106,43 @@ export default function AgendaPage() {
   }));
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6">
-      <div className="mb-4 flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold text-gray-900">Agenda</h1>
-        <div className="flex gap-2 flex-wrap items-center">
-          <ContextSelector context={agendaContext} onChange={setAgendaContext} />
-
-          <button
-            onClick={() => setViewMode('resourceTimeGridDay')}
-            className={`rounded-md px-3 py-1.5 text-sm border ${viewMode === 'resourceTimeGridDay' ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300 text-gray-700'}`}
-          >
-            Geral (dia)
-          </button>
-          <button
-            onClick={() => setViewMode('timeGridWeek')}
-            className={`rounded-md px-3 py-1.5 text-sm border ${viewMode === 'timeGridWeek' ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300 text-gray-700'}`}
-          >
-            Semana
-          </button>
-          <button
-            onClick={() => setViewMode('dayGridMonth')}
-            className={`rounded-md px-3 py-1.5 text-sm border ${viewMode === 'dayGridMonth' ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300 text-gray-700'}`}
-          >
-            Mês
-          </button>
-          <button
-            onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-1 rounded-md bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
-          >
-            <Plus className="h-4 w-4" /> Nova Consulta
-          </button>
-          <button
-            onClick={() => setShowEventModal(true)}
-            className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
-          >
-            <CalendarX className="h-4 w-4" /> Bloquear horário
-          </button>
-        </div>
-      </div>
+    <PageContainer size="xl">
+      <PageHeader
+        title="Agenda"
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <ContextSelector context={agendaContext} onChange={setAgendaContext} />
+            {/* Toggle de visualização */}
+            <div className="flex rounded-lg border border-gray-300 overflow-hidden">
+              {(
+                [
+                  { mode: 'resourceTimeGridDay', label: 'Geral (dia)' },
+                  { mode: 'timeGridWeek', label: 'Semana' },
+                  { mode: 'dayGridMonth', label: 'Mês' },
+                ] as const
+              ).map(({ mode, label }) => (
+                <button
+                  key={mode}
+                  onClick={() => setViewMode(mode)}
+                  className={`px-3 py-1.5 text-sm transition-colors ${
+                    viewMode === mode
+                      ? 'bg-primary-600 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <Button size="sm" onClick={() => setShowModal(true)}>
+              <Plus className="h-4 w-4" /> Nova Consulta
+            </Button>
+            <Button size="sm" variant="secondary" onClick={() => setShowEventModal(true)}>
+              <CalendarX className="h-4 w-4" /> Bloquear horário
+            </Button>
+          </div>
+        }
+      />
 
       {/* Professional legend */}
       {professionals.length > 0 && (
@@ -212,7 +212,7 @@ export default function AgendaPage() {
           error={createEvent.isError ? 'Erro ao criar evento.' : null}
         />
       )}
-    </div>
+    </PageContainer>
   );
 }
 

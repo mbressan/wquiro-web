@@ -1,11 +1,9 @@
 import { useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { PageContainer, PageHeaderBack } from '@/components/ui'
 import { usePosturalHistorico } from '@/hooks/usePosturalHistorico'
 import { PosturalComparisonView } from '@/components/prontuario/postural/PosturalComparisonView'
 import type { PosturalHistoricoItem } from '@/types/posture'
-
-interface PosturalHistoricoPageProps {
-  patientId: string
-}
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('pt-BR')
@@ -15,8 +13,10 @@ function recordTypeLabel(type: PosturalHistoricoItem['record_type']): string {
   return type === 'anamnesis' ? 'Anamnese' : 'Reavaliação'
 }
 
-export default function PosturalHistoricoPage({ patientId }: PosturalHistoricoPageProps) {
-  const { data: historico, isLoading, isError } = usePosturalHistorico(patientId)
+export default function PosturalHistoricoPage() {
+  const { patientId } = useParams<{ patientId: string }>()
+  const navigate = useNavigate()
+  const { data: historico, isLoading, isError } = usePosturalHistorico(patientId!)
 
   const [baselineId, setBaselineId] = useState<string | null>(null)
   const [currentId, setCurrentId] = useState<string | null>(null)
@@ -31,9 +31,12 @@ export default function PosturalHistoricoPage({ patientId }: PosturalHistoricoPa
 
   if (!historico || historico.length === 0) {
     return (
-      <div className="p-8 text-center text-gray-400">
-        Nenhuma avaliação postural registrada para este paciente.
-      </div>
+      <PageContainer>
+        <PageHeaderBack title="Histórico Postural" onBack={() => navigate(-1)} />
+        <div className="rounded-lg border border-dashed border-gray-300 py-16 text-center text-gray-400">
+          Nenhuma avaliação postural registrada para este paciente.
+        </div>
+      </PageContainer>
     )
   }
 
@@ -47,11 +50,16 @@ export default function PosturalHistoricoPage({ patientId }: PosturalHistoricoPa
   const currentItem = historico.find((h) => h.clinical_record_id === resolvedCurrentId) ?? last
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Histórico Postural</h1>
-        <span className="text-sm text-gray-500">{historico.length} avaliação{historico.length !== 1 ? 'ões' : ''}</span>
-      </div>
+    <PageContainer>
+      <PageHeaderBack
+        title="Histórico Postural"
+        onBack={() => navigate(-1)}
+        badge={
+          <span className="text-sm text-gray-500">
+            {historico.length} avaliação{historico.length !== 1 ? 'ões' : ''}
+          </span>
+        }
+      />
 
       {/* Cronologia */}
       <div className="bg-white rounded-xl border p-4 shadow-sm">
@@ -87,8 +95,8 @@ export default function PosturalHistoricoPage({ patientId }: PosturalHistoricoPa
                   className={[
                     'rounded px-2 py-1 text-xs font-medium transition-colors',
                     resolvedCurrentId === item.clinical_record_id
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-blue-50 text-blue-600 hover:bg-blue-100',
+                      ? 'bg-primary-600 text-white'
+                      : 'bg-primary-50 text-primary-600 hover:bg-primary-100',
                   ].join(' ')}
                 >
                   Atual
@@ -107,6 +115,6 @@ export default function PosturalHistoricoPage({ patientId }: PosturalHistoricoPa
           current={historico.length > 1 ? currentItem : undefined}
         />
       </div>
-    </div>
+    </PageContainer>
   )
 }

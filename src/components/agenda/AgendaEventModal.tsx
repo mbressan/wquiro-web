@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useProfessionals } from '@/hooks/useProfessionals';
 import { EventRecurrenceFields } from './EventRecurrenceFields';
+import { Modal, FormField, Input, Select, Textarea, Button } from '@/components/ui';
 import type { AgendaEventCreate, AgendaEventType } from '@/types/agenda';
 
 const EVENT_TYPES: { value: AgendaEventType; label: string }[] = [
@@ -19,7 +20,6 @@ const schema = z
     event_type: z.enum(['unavailable', 'external_commitment', 'personal_break']),
     title: z.string().min(1, 'Título é obrigatório'),
     description: z.string().optional(),
-    // recurrence
     is_recurring: z.boolean(),
     recurrence_frequency: z.enum(['weekly', 'monthly']).optional(),
     recurrence_weekday: z.string().optional(),
@@ -97,136 +97,69 @@ export function AgendaEventModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Novo Evento de Agenda</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            ✕
-          </button>
+    <Modal title="Novo Evento de Agenda" onClose={onClose} size="md">
+      {error && (
+        <div className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
+      )}
+
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        <FormField id="professional" label="Profissional" required error={errors.professional?.message}>
+          <Select id="professional" {...register('professional')} error={!!errors.professional}>
+            <option value="">Selecione...</option>
+            {professionals?.map((p) => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </Select>
+        </FormField>
+
+        <FormField id="event_type" label="Tipo" required>
+          <Select id="event_type" {...register('event_type')}>
+            {EVENT_TYPES.map((t) => (
+              <option key={t.value} value={t.value}>{t.label}</option>
+            ))}
+          </Select>
+        </FormField>
+
+        <FormField id="title" label="Título" required error={errors.title?.message}>
+          <Input id="title" type="text" {...register('title')} error={!!errors.title} />
+        </FormField>
+
+        <div className="grid grid-cols-2 gap-4">
+          <FormField id="start_at" label="Início" required error={errors.start_at?.message}>
+            <Input id="start_at" type="datetime-local" {...register('start_at')} error={!!errors.start_at} />
+          </FormField>
+          <FormField id="end_at" label="Término" required error={errors.end_at?.message}>
+            <Input id="end_at" type="datetime-local" {...register('end_at')} error={!!errors.end_at} />
+          </FormField>
         </div>
 
-        {error && (
-          <div className="mb-3 rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>
-        )}
+        <FormField id="description" label="Descrição">
+          <Textarea id="description" {...register('description')} rows={2} />
+        </FormField>
 
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-3">
-          {/* Professional */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Profissional *</label>
-            <select
-              {...register('professional')}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-            >
-              <option value="">Selecione...</option>
-              {professionals?.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-            {errors.professional && (
-              <p className="mt-1 text-xs text-red-600">{errors.professional.message}</p>
-            )}
-          </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="is_recurring"
+            {...register('is_recurring')}
+            className="h-4 w-4 rounded border-gray-300 text-primary-600"
+          />
+          <label htmlFor="is_recurring" className="text-sm text-gray-700">
+            Evento recorrente
+          </label>
+        </div>
 
-          {/* Type */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Tipo *</label>
-            <select
-              {...register('event_type')}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-            >
-              {EVENT_TYPES.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.label}
-                </option>
-              ))}
-            </select>
-          </div>
+        {isRecurring && <EventRecurrenceFields register={register} watch={watch} errors={errors} />}
 
-          {/* Title */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Título *</label>
-            <input
-              type="text"
-              {...register('title')}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-            />
-            {errors.title && (
-              <p className="mt-1 text-xs text-red-600">{errors.title.message}</p>
-            )}
-          </div>
-
-          {/* Start / End */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Início *</label>
-              <input
-                type="datetime-local"
-                {...register('start_at')}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-              />
-              {errors.start_at && (
-                <p className="mt-1 text-xs text-red-600">{errors.start_at.message}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Término *</label>
-              <input
-                type="datetime-local"
-                {...register('end_at')}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-              />
-              {errors.end_at && (
-                <p className="mt-1 text-xs text-red-600">{errors.end_at.message}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Descrição</label>
-            <textarea
-              {...register('description')}
-              rows={2}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-            />
-          </div>
-
-          {/* Recurrence toggle */}
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="is_recurring"
-              {...register('is_recurring')}
-              className="h-4 w-4 rounded border-gray-300 text-indigo-600"
-            />
-            <label htmlFor="is_recurring" className="text-sm text-gray-700">
-              Evento recorrente
-            </label>
-          </div>
-
-          {isRecurring && <EventRecurrenceFields register={register} watch={watch} errors={errors} />}
-
-          <div className="flex justify-end gap-2 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
-            >
-              {isLoading ? 'Salvando...' : 'Salvar'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="flex justify-end gap-2 pt-2">
+          <Button type="button" variant="secondary" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button type="submit" loading={isLoading}>
+            Salvar
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }

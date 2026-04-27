@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Plus } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
+import { PageHeader, Button, StatusBadge, PageContainer } from '@/components/ui';
 import {
   useProfessionalsAdmin,
   useDeactivateProfessional,
@@ -19,32 +21,14 @@ import type { Professional, Specialty, TeamInvite } from '@/types/professional';
 type Tab = 'ativos' | 'inativos' | 'convites' | 'especialidades';
 
 function InviteStatusBadge({ invite }: { invite: TeamInvite }) {
-  if (invite.accepted_at) {
-    return (
-      <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
-        Aceito
-      </span>
-    );
-  }
-  if (invite.cancelled_at) {
-    return (
-      <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">
-        Cancelado
-      </span>
-    );
-  }
-  if (invite.is_pending) {
-    return (
-      <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700">
-        Pendente
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
-      Expirado
-    </span>
-  );
+  const status = invite.accepted_at
+    ? 'accepted'
+    : invite.cancelled_at
+    ? 'cancelled'
+    : invite.is_pending
+    ? 'pending'
+    : 'expired';
+  return <StatusBadge type="invite" status={status} />;
 }
 
 export default function ProfissionaisPage() {
@@ -138,41 +122,31 @@ export default function ProfissionaisPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Profissionais</h1>
-          <p className="text-sm text-gray-500">Gerencie a equipe da clínica</p>
-        </div>
-        {isAdmin && (
-          <div className="flex gap-3">
-            {activeTab === 'especialidades' ? (
-              <button
-                onClick={openCreateSpecialty}
-                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-              >
-                Nova Especialidade
-              </button>
-            ) : (
-              <>
-                <button
-                  onClick={() => setShowInviteModal(true)}
-                  className="rounded-md border border-blue-600 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50"
-                >
-                  Convidar
-                </button>
-                <button
-                  onClick={openCreate}
-                  className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                >
-                  Novo Profissional
-                </button>
-              </>
-            )}
-          </div>
-        )}
-      </div>
+    <PageContainer>
+      <PageHeader
+        title="Profissionais"
+        subtitle="Gerencie a equipe da clínica"
+        actions={
+          isAdmin ? (
+            <div className="flex gap-2">
+              {activeTab === 'especialidades' ? (
+                <Button size="sm" onClick={openCreateSpecialty}>
+                  <Plus className="h-4 w-4" /> Nova Especialidade
+                </Button>
+              ) : (
+                <>
+                  <Button size="sm" variant="secondary" onClick={() => setShowInviteModal(true)}>
+                    Convidar
+                  </Button>
+                  <Button size="sm" onClick={openCreate}>
+                    <Plus className="h-4 w-4" /> Novo Profissional
+                  </Button>
+                </>
+              )}
+            </div>
+          ) : undefined
+        }
+      />
 
       {/* Tabs */}
       <div className="border-b border-gray-200">
@@ -183,7 +157,7 @@ export default function ProfissionaisPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`border-b-2 px-1 pb-3 text-sm font-medium transition-colors ${
                 activeTab === tab.id
-                  ? 'border-blue-600 text-blue-600'
+                  ? 'border-primary-600 text-primary-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -336,6 +310,6 @@ export default function ProfissionaisPage() {
           toast.success(selectedSpecialty ? 'Especialidade atualizada.' : 'Especialidade criada.');
         }}
       />
-    </div>
+    </PageContainer>
   );
 }

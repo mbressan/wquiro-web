@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Phone, Mail, MapPin } from 'lucide-react';
+import { Download, Phone, Mail, MapPin } from 'lucide-react';
 import { usePatient } from '@/hooks/usePatients';
 import { PatientTimeline } from '@/components/pacientes/PatientTimeline';
 import { TagBadge } from '@/components/pacientes/TagBadge';
+import { PageHeaderBack, Button, PageContainer } from '@/components/ui';
 
 export default function PacienteDetalhePage() {
   const { id } = useParams<{ id: string }>();
@@ -29,34 +30,29 @@ export default function PacienteDetalhePage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-6">
-      <button
-        onClick={() => navigate('/pacientes')}
-        className="mb-4 inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Voltar
-      </button>
-
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{patient.name}</h1>
-          {patient.is_new_patient && (
-            <span className="mt-1 inline-block rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+    <PageContainer size="md">
+      <PageHeaderBack
+        title={patient.name}
+        onBack={() => navigate('/pacientes')}
+        badge={
+          patient.is_new_patient ? (
+            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
               Novo Paciente
             </span>
-          )}
-        </div>
-        <a
-          href={`/api/v1/pacientes/${patient.id}/export/`}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
-        >
-          <Download className="h-4 w-4" />
-          Exportar LGPD
-        </a>
-      </div>
+          ) : undefined
+        }
+        actions={
+          <a
+            href={`/api/v1/pacientes/${patient.id}/export/`}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          >
+            <Download className="h-4 w-4" />
+            Exportar LGPD
+          </a>
+        }
+      />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Dados cadastrais */}
@@ -135,6 +131,6 @@ export default function PacienteDetalhePage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

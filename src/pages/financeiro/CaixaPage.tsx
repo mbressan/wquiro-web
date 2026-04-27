@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { PaymentForm } from '@/components/financeiro/PaymentForm';
 import { useCaixa, useCreatePayment } from '@/hooks/useFinancial';
+import { PageHeader, Input, CardWithHeader, PageContainer } from '@/components/ui';
 import type { CaixaPaymentRow } from '@/types/financial';
 
 const METHOD_LABELS: Record<string, string> = {
@@ -28,41 +29,42 @@ export default function CaixaPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Caixa</h1>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="rounded-md border px-3 py-2 text-sm"
-        />
-      </div>
+    <PageContainer>
+      <PageHeader
+        title="Caixa"
+        actions={
+          <Input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="w-auto"
+          />
+        }
+      />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-1 rounded-xl border bg-white p-5 shadow-sm space-y-4">
-          <h2 className="text-sm font-semibold text-gray-700">Registrar Pagamento</h2>
-          <PaymentForm onSubmit={handleCreatePayment} isLoading={create.isPending} />
+        <div className="lg:col-span-1">
+          <CardWithHeader title="Registrar Pagamento">
+            <PaymentForm onSubmit={handleCreatePayment} isLoading={create.isPending} />
+          </CardWithHeader>
         </div>
 
         <div className="lg:col-span-2 space-y-4">
           {/* Summary */}
-          <div className="rounded-xl border bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-semibold text-gray-700">Resumo do Dia</h2>
-              <span className="text-lg font-bold text-green-700">R$ {data?.total ?? '0.00'}</span>
-            </div>
+          <CardWithHeader
+            title="Resumo do Dia"
+            action={<span className="text-lg font-bold text-emerald-700">R$ {data?.total ?? '0.00'}</span>}
+          >
             <div className="flex flex-wrap gap-2">
               {(data?.by_method ?? []).map((m) => (
-                <span key={m.payment_method} className="rounded-full bg-blue-50 px-3 py-1 text-xs text-blue-700">
+                <span key={m.payment_method} className="rounded-full bg-primary-50 px-3 py-1 text-xs text-primary-700">
                   {METHOD_LABELS[m.payment_method] ?? m.payment_method}: R$ {m.total} ({m.count}x)
                 </span>
               ))}
             </div>
-          </div>
 
           {/* Table */}
-          <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
+          <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-gray-50">
                 <tr>
@@ -83,7 +85,7 @@ export default function CaixaPage() {
                       <td className="px-4 py-3 text-gray-500">{p.receipt_number}</td>
                       <td className="px-4 py-3 font-medium">{p.patient__name}</td>
                       <td className="px-4 py-3 text-gray-600">{METHOD_LABELS[p.payment_method] ?? p.payment_method}</td>
-                      <td className="px-4 py-3 text-right font-semibold text-green-700">R$ {p.amount}</td>
+                      <td className="px-4 py-3 text-right font-semibold text-emerald-700">R$ {p.amount}</td>
                     </tr>
                   ))
                 )}
@@ -92,6 +94,6 @@ export default function CaixaPage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

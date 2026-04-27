@@ -1,21 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { FileText, ChevronRight, AlertCircle } from 'lucide-react';
 import { usePatientRecords } from '@/hooks/useRecords';
+import { PageHeaderBack, StatusBadge } from '@/components/ui';
 import type { ClinicalRecordListItem } from '@/types/record';
-
-const RECORD_TYPE_LABELS: Record<string, string> = {
-  anamnesis: 'Anamnese',
-  follow_up: 'Retorno',
-  reevaluation: 'Reavaliação',
-  discharge: 'Alta',
-};
-
-const RECORD_TYPE_COLORS: Record<string, string> = {
-  anamnesis: 'bg-purple-100 text-purple-700',
-  follow_up: 'bg-blue-100 text-blue-700',
-  reevaluation: 'bg-orange-100 text-orange-700',
-  discharge: 'bg-green-100 text-green-700',
-};
 
 function RecordCard({ record }: { record: ClinicalRecordListItem }) {
   const navigate = useNavigate();
@@ -23,7 +10,7 @@ function RecordCard({ record }: { record: ClinicalRecordListItem }) {
   return (
     <button
       onClick={() => navigate(`/prontuario/${record.id}`)}
-      className="flex w-full items-center justify-between rounded-lg border bg-white p-4 text-left shadow-sm transition hover:border-blue-300 hover:shadow"
+      className="flex w-full items-center justify-between rounded-xl border border-gray-200 bg-white p-4 text-left shadow-sm transition hover:border-primary-200 hover:shadow"
     >
       <div className="flex items-start gap-3">
         <FileText className="mt-0.5 h-5 w-5 flex-shrink-0 text-gray-400" />
@@ -36,13 +23,7 @@ function RecordCard({ record }: { record: ClinicalRecordListItem }) {
                 year: 'numeric',
               })}
             </span>
-            <span
-              className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                RECORD_TYPE_COLORS[record.record_type] ?? 'bg-gray-100 text-gray-600'
-              }`}
-            >
-              {RECORD_TYPE_LABELS[record.record_type] ?? record.record_type}
-            </span>
+            <StatusBadge type="record" status={record.record_type as any} />
             {record.pain_scale !== null && (
               <span className="text-xs text-orange-600">EVA {record.pain_scale}/10</span>
             )}
@@ -70,17 +51,7 @@ export default function PatientProntuarioPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <button
-            onClick={() => navigate(-1)}
-            className="mb-1 text-sm text-gray-500 hover:text-gray-700"
-          >
-            ← Voltar
-          </button>
-          <h1 className="text-2xl font-bold text-gray-900">Prontuários</h1>
-        </div>
-      </div>
+      <PageHeaderBack title="Prontuários" onBack={() => navigate(-1)} />
 
       {isLoading && (
         <p className="py-12 text-center text-sm text-gray-400">Carregando registros...</p>

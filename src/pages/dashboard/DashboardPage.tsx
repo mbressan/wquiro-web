@@ -1,5 +1,6 @@
 import { Users, CalendarDays, DollarSign, TrendingUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { PageContainer } from '@/components/ui'
 
 interface StatCardProps {
   label: string
@@ -33,7 +34,7 @@ function StatCard({ label, value, icon: Icon, trend, trendUp, color }: StatCardP
 
 export function DashboardPage() {
   return (
-    <div className="p-6 space-y-6">
+    <PageContainer size="xl">
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
@@ -115,6 +116,6 @@ export function DashboardPage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   )
 }

@@ -2,8 +2,9 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, X } from 'lucide-react';
 import { usePatients, useCreatePatient, usePatientTags } from '@/hooks/usePatients';
-import { PatientCard } from '@/components/pacientes/PatientCard';
+import { PatientTable } from '@/components/pacientes/PatientTable';
 import { PatientForm } from '@/components/pacientes/PatientForm';
+import { Button, PageHeader, Modal, PageContainer } from '@/components/ui';
 import type { PatientFilters, PatientCreate } from '@/types/patient';
 import { toast } from 'sonner';
 
@@ -61,17 +62,16 @@ export default function PacientesListPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Pacientes</h1>
-        <button
-          onClick={() => setShowModal(true)}
-          className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
-          <Plus className="h-4 w-4" />
-          Novo Paciente
-        </button>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title="Pacientes"
+        actions={
+          <Button onClick={() => setShowModal(true)}>
+            <Plus className="h-4 w-4" />
+            Novo Paciente
+          </Button>
+        }
+      />
 
       {limitWarning && (
         <div className="mb-4 rounded-md bg-yellow-50 border border-yellow-200 px-4 py-3 text-sm text-yellow-800">
@@ -93,7 +93,7 @@ export default function PacientesListPage() {
               setPage(1);
             }}
             placeholder="Buscar por nome, CPF ou telefone..."
-            className="w-full rounded-md border border-gray-300 py-2 pl-9 pr-3 text-sm focus:border-blue-500 focus:outline-none"
+            className="block w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-9 pr-3 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
 
@@ -105,7 +105,7 @@ export default function PacientesListPage() {
                 onClick={() => setSelectedTag(selectedTag === tag.name ? '' : tag.name)}
                 className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                   selectedTag === tag.name
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-primary-600 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -126,65 +126,37 @@ export default function PacientesListPage() {
 
       {isLoading ? (
         <div className="py-12 text-center text-sm text-gray-500">Carregando...</div>
-      ) : data?.results.length === 0 ? (
-        <div className="py-12 text-center text-sm text-gray-500">
-          Nenhum paciente encontrado.
-        </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {data?.results.map((patient) => (
-            <PatientCard
-              key={patient.id}
-              patient={patient}
-              onClick={() => navigate(`/pacientes/${patient.id}`)}
-            />
-          ))}
-        </div>
+        <PatientTable
+          patients={data?.results ?? []}
+          onRowClick={(p) => navigate(`/pacientes/${p.id}`)}
+        />
       )}
 
       {data && data.count > 20 && (
         <div className="mt-6 flex items-center justify-center gap-4">
-          <button
-            disabled={!data.previous}
-            onClick={() => setPage((p) => p - 1)}
-            className="rounded-md border px-3 py-1 text-sm disabled:opacity-40"
-          >
+          <Button variant="secondary" size="sm" disabled={!data.previous} onClick={() => setPage((p) => p - 1)}>
             Anterior
-          </button>
+          </Button>
           <span className="text-sm text-gray-600">
             Página {page} · {data.count} pacientes
           </span>
-          <button
-            disabled={!data.next}
-            onClick={() => setPage((p) => p + 1)}
-            className="rounded-md border px-3 py-1 text-sm disabled:opacity-40"
-          >
+          <Button variant="secondary" size="sm" disabled={!data.next} onClick={() => setPage((p) => p + 1)}>
             Próxima
-          </button>
+          </Button>
         </div>
       )}
 
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-2xl rounded-xl bg-white p-6 shadow-xl">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Novo Paciente</h2>
-              <button
-                onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <PatientForm
-              onSubmit={handleCreate}
-              isLoading={createPatient.isPending}
-              error={createPatient.isError ? 'Erro ao salvar. Verifique os dados.' : null}
-              onCancel={() => setShowModal(false)}
-            />
-          </div>
-        </div>
+        <Modal title="Novo Paciente" onClose={() => setShowModal(false)} size="lg">
+          <PatientForm
+            onSubmit={handleCreate}
+            isLoading={createPatient.isPending}
+            error={createPatient.isError ? 'Erro ao salvar. Verifique os dados.' : null}
+            onCancel={() => setShowModal(false)}
+          />
+        </Modal>
       )}
-    </div>
+    </PageContainer>
   );
 }

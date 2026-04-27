@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useCreatePatient } from '@/hooks/usePatients';
+import { FormField, Input, Button } from '@/components/ui';
 import type { PatientCreate } from '@/types/patient';
 
 const schema = z.object({
@@ -15,24 +16,17 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 interface PatientQuickCreateProps {
-  /** Called with the new patient id after successful creation. */
   onCreated: (patientId: string, patientName: string) => void;
   onCancel: () => void;
 }
 
-/**
- * Inline mini-form to create a patient without leaving the appointment flow.
- * Shown inside AppointmentModal when the user clicks "Novo paciente".
- */
 export function PatientQuickCreate({ onCreated, onCancel }: PatientQuickCreateProps) {
   const createPatient = useCreatePatient();
   const [apiError, setApiError] = useState<string | null>(null);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
 
   async function onSubmit(values: FormData) {
     setApiError(null);
@@ -48,7 +42,7 @@ export function PatientQuickCreate({ onCreated, onCancel }: PatientQuickCreatePr
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number } })?.response?.status;
       if (status === 402) {
-        setApiError('Limite de pacientes atingido. Faça upgrade do seu plano para adicionar mais.');
+        setApiError('Limite de pacientes atingido. Faça upgrade do seu plano.');
       } else {
         setApiError('Erro ao cadastrar paciente. Verifique os dados e tente novamente.');
       }
@@ -56,77 +50,40 @@ export function PatientQuickCreate({ onCreated, onCancel }: PatientQuickCreatePr
   }
 
   return (
-    <div className="rounded-md border border-indigo-200 bg-indigo-50 p-3 space-y-3">
-      <p className="text-xs font-semibold text-indigo-700 uppercase tracking-wide">
+    <div className="rounded-xl border border-primary-200 bg-primary-50 p-4 space-y-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-primary-700">
         Novo paciente
       </p>
 
       {apiError && (
-        <div className="rounded-md bg-red-50 p-2 text-xs text-red-700">{apiError}</div>
+        <div className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{apiError}</div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Nome *</label>
-          <input
-            type="text"
-            {...register('name')}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm"
-          />
-          {errors.name && (
-            <p className="mt-0.5 text-xs text-red-600">{errors.name.message}</p>
-          )}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+        <FormField id="qc-name" label="Nome" required error={errors.name?.message}>
+          <Input id="qc-name" type="text" {...register('name')} error={!!errors.name} />
+        </FormField>
+
+        <div className="grid grid-cols-2 gap-3">
+          <FormField id="qc-phone" label="Telefone" required error={errors.phone?.message}>
+            <Input id="qc-phone" type="tel" {...register('phone')} error={!!errors.phone} />
+          </FormField>
+          <FormField id="qc-email" label="E-mail" error={errors.email?.message}>
+            <Input id="qc-email" type="email" {...register('email')} error={!!errors.email} />
+          </FormField>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Telefone *</label>
-            <input
-              type="tel"
-              {...register('phone')}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm"
-            />
-            {errors.phone && (
-              <p className="mt-0.5 text-xs text-red-600">{errors.phone.message}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">E-mail</label>
-            <input
-              type="email"
-              {...register('email')}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm"
-            />
-            {errors.email && (
-              <p className="mt-0.5 text-xs text-red-600">{errors.email.message}</p>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Data de nascimento</label>
-          <input
-            type="date"
-            {...register('date_of_birth')}
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm"
-          />
-        </div>
+        <FormField id="qc-dob" label="Data de nascimento">
+          <Input id="qc-dob" type="date" {...register('date_of_birth')} />
+        </FormField>
 
         <div className="flex justify-end gap-2 pt-1">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
-          >
+          <Button type="button" variant="secondary" size="sm" onClick={onCancel}>
             Cancelar
-          </button>
-          <button
-            type="submit"
-            disabled={createPatient.isPending}
-            className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
-          >
-            {createPatient.isPending ? 'Salvando...' : 'Criar paciente'}
-          </button>
+          </Button>
+          <Button type="submit" size="sm" loading={createPatient.isPending}>
+            Criar paciente
+          </Button>
         </div>
       </form>
     </div>

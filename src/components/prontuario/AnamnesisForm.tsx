@@ -1,6 +1,7 @@
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Button } from '@/components/ui';
 import { PainScaleEVA } from './PainScaleEVA';
 import { PainBodyMap } from './PainBodyMap';
 import { SpineMapCanvas } from './SpineMapCanvas';
@@ -68,34 +69,34 @@ export function AnamnesisForm({ defaultValues, onSubmit, isLoading, posturalAsse
         <h3 className="text-sm font-semibold text-gray-800">Queixa e História</h3>
         <div>
           <label className="block text-xs font-medium text-gray-600">Queixa Principal</label>
-          <input {...register('chief_complaint')} className="mt-1 block w-full rounded-md border px-3 py-2 text-sm" />
+          <input {...register('chief_complaint')} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-600">HMA (História da Moléstia Atual)</label>
-          <textarea {...register('hma')} rows={3} className="mt-1 block w-full rounded-md border px-3 py-2 text-sm" />
+          <textarea {...register('hma')} rows={3} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-600">Antecedentes Pessoais</label>
-          <textarea {...register('past_history')} rows={2} className="mt-1 block w-full rounded-md border px-3 py-2 text-sm" />
+          <textarea {...register('past_history')} rows={2} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-gray-600">Ocupação</label>
-            <input {...register('occupation')} className="mt-1 block w-full rounded-md border px-3 py-2 text-sm" />
+            <input {...register('occupation')} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-600">Atividade Física</label>
-            <input {...register('physical_activity')} className="mt-1 block w-full rounded-md border px-3 py-2 text-sm" />
+            <input {...register('physical_activity')} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
           </div>
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-600">Medicamentos</label>
-          <input {...register('medications')} placeholder="Separar por vírgula" className="mt-1 block w-full rounded-md border px-3 py-2 text-sm" />
+          <input {...register('medications')} placeholder="Separar por vírgula" className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-gray-600">Início</label>
-            <select {...register('onset')} className="mt-1 block w-full rounded-md border px-3 py-2 text-sm">
+            <select {...register('onset')} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500">
               <option value="">—</option>
               <option value="gradual">Gradual</option>
               <option value="sudden">Súbito</option>
@@ -103,7 +104,7 @@ export function AnamnesisForm({ defaultValues, onSubmit, isLoading, posturalAsse
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-600">Data de Início</label>
-            <input type="date" {...register('onset_date')} className="mt-1 block w-full rounded-md border px-3 py-2 text-sm" />
+            <input type="date" {...register('onset_date')} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
           </div>
         </div>
       </section>
@@ -152,7 +153,7 @@ export function AnamnesisForm({ defaultValues, onSubmit, isLoading, posturalAsse
         {(['subjective', 'objective', 'assessment', 'plan'] as const).map((f) => (
           <div key={f}>
             <label className="block text-xs font-medium text-gray-600 capitalize">{f}</label>
-            <textarea {...register(f)} rows={2} className="mt-1 block w-full rounded-md border px-3 py-2 text-sm" />
+            <textarea {...register(f)} rows={2} className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm placeholder-gray-400 transition-colors hover:border-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500" />
           </div>
         ))}
       </section>
@@ -167,13 +168,9 @@ export function AnamnesisForm({ defaultValues, onSubmit, isLoading, posturalAsse
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full rounded-md bg-blue-600 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
-      >
-        {isLoading ? 'Salvando...' : 'Salvar Prontuário'}
-      </button>
+      <Button type="submit" loading={isLoading} className="w-full">
+        Salvar Prontuário
+      </Button>
     </form>
   );
 }

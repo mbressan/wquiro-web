@@ -7,6 +7,7 @@ import { useProfessionals, useSlots } from '@/hooks/useProfessionals';
 import { useSessionPackages } from '@/hooks/useAppointments';
 import { usePatients } from '@/hooks/usePatients';
 import { PatientQuickCreate } from './PatientQuickCreate';
+import { Modal, FormField, Input, Select, Textarea, Button } from '@/components/ui';
 import type { AppointmentCreate } from '@/types/appointment';
 
 const schema = z
@@ -87,150 +88,87 @@ export function AppointmentModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Nova Consulta</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">✕</button>
-        </div>
+    <Modal title="Nova Consulta" onClose={onClose} size="md">
+      {error && (
+        <div className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
+      )}
 
-        {error && (
-          <div className="mb-3 rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</div>
-        )}
-
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-3">
-          {/* Patient */}
-          <div>
-            <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium text-gray-700">Paciente *</label>
-              {!showQuickCreate && (
-                <button
-                  type="button"
-                  onClick={() => setShowQuickCreate(true)}
-                  className="text-xs text-indigo-600 hover:underline"
-                >
-                  + Novo paciente
-                </button>
-              )}
-            </div>
-            {showQuickCreate ? (
-              <PatientQuickCreate
-                onCreated={(id) => handlePatientCreated(id)}
-                onCancel={() => setShowQuickCreate(false)}
-              />
-            ) : (
-              <>
-                <select
-                  {...register('patient')}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-                >
-                  <option value="">Selecione...</option>
-                  {patients.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
-                {errors.patient && (
-                  <p className="text-xs text-red-600">{errors.patient.message}</p>
-                )}
-              </>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Profissional *</label>
-            <select
-              {...register('professional')}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-            >
-              <option value="">Selecione...</option>
-              {professionals?.map((p) => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </select>
-            {errors.professional && (
-              <p className="text-xs text-red-600">{errors.professional.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Início *</label>
-            <input
-              {...register('scheduled_at')}
-              type="datetime-local"
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        {/* Patient */}
+        <FormField id="patient" label="Paciente" required error={errors.patient?.message}>
+          {showQuickCreate ? (
+            <PatientQuickCreate
+              onCreated={handlePatientCreated}
+              onCancel={() => setShowQuickCreate(false)}
             />
-            {errors.scheduled_at && (
-              <p className="text-xs text-red-600">{errors.scheduled_at.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Término *</label>
-            <input
-              {...register('end_at')}
-              type="datetime-local"
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-            />
-            {errors.end_at && (
-              <p className="text-xs text-red-600">{errors.end_at.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Tipo</label>
-            <input
-              {...register('appointment_type')}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-              placeholder="ex: Avaliação, Retorno..."
-            />
-          </div>
-
-          {packages && packages.length > 0 && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Pacote de Sessões</label>
-              <select
-                {...register('session_package')}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-              >
-                <option value="">Sem pacote</option>
-                {packages.filter((p) => p.is_valid).map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} ({p.remaining_sessions} sessões)
-                  </option>
+          ) : (
+            <div className="space-y-1">
+              <Select id="patient" {...register('patient')} error={!!errors.patient}>
+                <option value="">Selecione...</option>
+                {patients.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
                 ))}
-              </select>
+              </Select>
+              <button
+                type="button"
+                onClick={() => setShowQuickCreate(true)}
+                className="text-xs text-primary-600 hover:underline"
+              >
+                + Novo paciente
+              </button>
             </div>
           )}
+        </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Observações</label>
-            <textarea
-              {...register('notes')}
-              rows={2}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-            />
-          </div>
+        <FormField id="professional" label="Profissional" required error={errors.professional?.message}>
+          <Select id="professional" {...register('professional')} error={!!errors.professional}>
+            <option value="">Selecione...</option>
+            {professionals?.map((p) => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </Select>
+        </FormField>
 
-          <div className="flex justify-end gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-md border px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
-            >
-              {isLoading ? 'Salvando...' : 'Agendar'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="grid grid-cols-2 gap-4">
+          <FormField id="scheduled_at" label="Início" required error={errors.scheduled_at?.message}>
+            <Input id="scheduled_at" type="datetime-local" {...register('scheduled_at')} error={!!errors.scheduled_at} />
+          </FormField>
+
+          <FormField id="end_at" label="Término" required error={errors.end_at?.message}>
+            <Input id="end_at" type="datetime-local" {...register('end_at')} error={!!errors.end_at} />
+          </FormField>
+        </div>
+
+        <FormField id="appointment_type" label="Tipo">
+          <Input id="appointment_type" {...register('appointment_type')} placeholder="ex: Avaliação, Retorno..." />
+        </FormField>
+
+        {packages && packages.length > 0 && (
+          <FormField id="session_package" label="Pacote de Sessões">
+            <Select id="session_package" {...register('session_package')}>
+              <option value="">Sem pacote</option>
+              {packages.filter((p) => p.is_valid).map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name} ({p.remaining_sessions} sessões)
+                </option>
+              ))}
+            </Select>
+          </FormField>
+        )}
+
+        <FormField id="notes" label="Observações">
+          <Textarea id="notes" {...register('notes')} rows={2} />
+        </FormField>
+
+        <div className="flex justify-end gap-3 pt-2">
+          <Button type="button" variant="secondary" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button type="submit" loading={isLoading}>
+            Agendar
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }

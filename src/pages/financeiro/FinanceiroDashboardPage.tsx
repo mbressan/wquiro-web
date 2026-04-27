@@ -1,5 +1,6 @@
 import { useFinancialDashboard } from '@/hooks/useFinancial';
 import { RevenueChart } from '@/components/financeiro/RevenueChart';
+import { PageHeader, PageContainer } from '@/components/ui';
 
 interface KPICardProps {
   label: string;
@@ -29,8 +30,8 @@ export default function FinanceiroDashboardPage() {
   if (!data) return null;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Dashboard Financeiro</h1>
+    <PageContainer>
+      <PageHeader title="Dashboard Financeiro" />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KPICard label="Receita Hoje" value={`R$ ${Number(data.revenue_today).toFixed(2)}`} />
@@ -65,6 +66,6 @@ export default function FinanceiroDashboardPage() {
           </div>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

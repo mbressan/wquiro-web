@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form';
+import { FormField, Input, Select, Textarea, Button } from '@/components/ui';
 import type { PaymentCreate } from '@/types/financial';
 
 const METHOD_LABELS: Record<string, string> = {
@@ -51,55 +52,46 @@ export function PaymentForm({ onSubmit, isLoading, defaultAppointmentId, default
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Valor *</label>
-          <input
+        <FormField id="amount" label="Valor" required error={errors.amount?.message}>
+          <Input
+            id="amount"
             {...register('amount', { required: 'Obrigatório' })}
             type="number"
             step="0.01"
             min="0"
-            className="mt-1 block w-full rounded-md border px-3 py-2 text-sm"
+            error={!!errors.amount}
           />
-          {errors.amount && <p className="text-xs text-red-600">{errors.amount.message}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Método *</label>
-          <select
+        </FormField>
+        <FormField id="payment_method" label="Método" required error={errors.payment_method?.message}>
+          <Select
+            id="payment_method"
             {...register('payment_method', { required: 'Obrigatório' })}
-            className="mt-1 block w-full rounded-md border px-3 py-2 text-sm"
+            error={!!errors.payment_method}
           >
             <option value="">Selecione...</option>
             {Object.entries(METHOD_LABELS).map(([v, l]) => (
               <option key={v} value={v}>{l}</option>
             ))}
-          </select>
-          {errors.payment_method && <p className="text-xs text-red-600">{errors.payment_method.message}</p>}
-        </div>
+          </Select>
+        </FormField>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Data/Hora *</label>
-        <input
+      <FormField id="paid_at" label="Data/Hora" required error={errors.paid_at?.message}>
+        <Input
+          id="paid_at"
           {...register('paid_at', { required: 'Obrigatório' })}
           type="datetime-local"
-          className="mt-1 block w-full rounded-md border px-3 py-2 text-sm"
+          error={!!errors.paid_at}
         />
-        {errors.paid_at && <p className="text-xs text-red-600">{errors.paid_at.message}</p>}
-      </div>
+      </FormField>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Observações</label>
-        <textarea {...register('notes')} rows={2} className="mt-1 block w-full rounded-md border px-3 py-2 text-sm" />
-      </div>
+      <FormField id="notes" label="Observações">
+        <Textarea id="notes" {...register('notes')} rows={2} />
+      </FormField>
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full rounded-md bg-green-600 py-2 text-sm text-white hover:bg-green-700 disabled:opacity-50"
-      >
-        {isLoading ? 'Registrando...' : 'Registrar Pagamento'}
-      </button>
+      <Button type="submit" loading={isLoading} className="w-full">
+        Registrar Pagamento
+      </Button>
     </form>
   );
 }
-
