@@ -44,8 +44,13 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'wquiro-auth',
       storage: createJSONStorage(() => localStorage),
-      // Only persist refresh token - access token stays in memory only
-      partialize: (state) => ({ refreshToken: state.refreshToken }),
+      // accessToken stays in memory only (XSS protection)
+      partialize: (state) => ({
+        refreshToken: state.refreshToken,
+        user: state.user,
+        clinic: state.clinic,
+        subscription: state.subscription,
+      }),
     },
   ),
 )

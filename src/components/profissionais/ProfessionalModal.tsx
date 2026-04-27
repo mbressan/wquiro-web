@@ -39,7 +39,7 @@ const schema = z.object({
     .union([z.number().min(0, 'Mínimo 0').max(100, 'Máximo 100'), z.null()])
     .optional(),
   notes: z.string().optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida').default('#3b82f6'),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Cor inválida'),
 });
 
 type FormData = z.infer<typeof schema>;
