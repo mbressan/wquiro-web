@@ -146,6 +146,22 @@ export const router = createBrowserRouter([
               </Suspense>
             ),
           },
+          {
+            path: '/pacientes/:patientId/postural',
+            element: (
+              <Suspense fallback={<Loading />}>
+                <PosturalHistoricoPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: '/configuracoes',
+            element: (
+              <Suspense fallback={<Loading />}>
+                <ConfiguracoesPage />
+              </Suspense>
+            ),
+          },
         ],
       },
     ],

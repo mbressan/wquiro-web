@@ -120,6 +120,12 @@ export default function PacienteDetalhePage() {
             >
               Prontuário
             </button>
+            <button
+              onClick={() => navigate(`/pacientes/${patient.id}/postural`)}
+              className="flex-1 rounded-md border py-2 text-sm text-center hover:bg-gray-50"
+            >
+              Postural
+            </button>
           </div>
         </div>
 
