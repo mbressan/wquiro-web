@@ -5,10 +5,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useAppointments, useCreateAppointment, APPOINTMENTS_KEY } from '@/hooks/useAppointments';
 import { useProfessionals } from '@/hooks/useProfessionals';
 import { useAgendaContext } from '@/hooks/useAgendaContext';
+import { useAgendaView } from '@/hooks/useAgendaView';
 import { useAgendaEvents, useCreateAgendaEvent, EVENTS_KEY } from '@/hooks/useAgendaEvents';
 import api from '@/lib/api';
 import { AgendaCalendar } from '@/components/agenda/AgendaCalendar';
 import { AppointmentModal } from '@/components/agenda/AppointmentModal';
+import { AppointmentDetailModal } from '@/components/agenda/AppointmentDetailModal';
 import { AgendaEventModal } from '@/components/agenda/AgendaEventModal';
 import { ContextSelector } from '@/components/agenda/ContextSelector';
 import { BookingFeeAlert } from '@/components/agenda/BookingFeeAlert';
@@ -16,34 +18,42 @@ import { ProfessionalColorDot } from '@/components/agenda/ProfessionalColorDot';
 import type { Appointment, AppointmentCreate } from '@/types/appointment';
 import type { AgendaEventCreate } from '@/types/agenda';
 
-type ViewMode = 'resourceTimeGridDay' | 'timeGridDay' | 'timeGridWeek' | 'dayGridMonth';
-
 export default function AgendaPage() {
   const qc = useQueryClient();
-  const [viewMode, setViewMode] = useState<ViewMode>('resourceTimeGridDay');
+  const [viewMode, setViewMode] = useAgendaView();
   const [showModal, setShowModal] = useState(false);
   const [showEventModal, setShowEventModal] = useState(false);
-  const [, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [defaultDate, setDefaultDate] = useState('');
-  const [month] = useState(() => {
-    const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  });
+  const [dateRange, setDateRange] = useState<{ from: string; to: string } | null>(null);
 
   const [agendaContext, setAgendaContext] = useAgendaContext();
 
   const { data: professionalsData } = useProfessionals();
   const professionals = professionalsData ?? [];
 
-  const apptFilters = { month, ...(agendaContext ? { professional: agendaContext } : {}) };
+  const apptFilters = {
+    ...(dateRange ? { date_from: dateRange.from, date_to: dateRange.to } : {}),
+    ...(agendaContext ? { professional: agendaContext } : {}),
+  };
   const { data: appointmentsData } = useAppointments(apptFilters);
   const appointments = appointmentsData?.results ?? [];
 
-  const eventFilters = { ...(agendaContext ? { professional: agendaContext } : {}), date_from: `${month}-01` };
+  const eventFilters = {
+    ...(dateRange ? { date_from: dateRange.from, date_to: dateRange.to } : {}),
+    ...(agendaContext ? { professional: agendaContext } : {}),
+  };
   const { data: agendaEvents = [] } = useAgendaEvents(eventFilters);
 
   const createAppt = useCreateAppointment();
   const createEvent = useCreateAgendaEvent();
+
+  function handleDatesChange(start: Date, end: Date) {
+    setDateRange({
+      from: start.toISOString().slice(0, 10),
+      to: end.toISOString().slice(0, 10),
+    });
+  }
 
   function handleCreate(data: AppointmentCreate) {
     createAppt.mutate(data, {
@@ -161,6 +171,7 @@ export default function AgendaPage() {
         professionals={professionals}
         viewMode={viewMode}
         backgroundEvents={eventBackgrounds}
+        onDatesChange={handleDatesChange}
         onDateClick={(date) => {
           setDefaultDate(date + 'T09:00');
           setShowModal(true);
@@ -168,6 +179,18 @@ export default function AgendaPage() {
         onEventClick={setSelectedAppointment}
         onEventDrop={handleEventDrop}
       />
+
+      {selectedAppointment && (
+        <AppointmentDetailModal
+          appointment={selectedAppointment}
+          onClose={() => setSelectedAppointment(null)}
+          onEdit={() => {
+            setDefaultDate(selectedAppointment.scheduled_at);
+            setSelectedAppointment(null);
+            setShowModal(true);
+          }}
+        />
+      )}
 
       {showModal && (
         <AppointmentModal
@@ -192,3 +215,4 @@ export default function AgendaPage() {
     </div>
   );
 }
+
