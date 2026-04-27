@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 220" fill="none">
+  <!-- cabeça -->
+  <circle cx="55" cy="20" r="15" stroke="#94a3b8" stroke-width="2"/>
+  <!-- coluna cervical -->
+  <line x1="52" y1="35" x2="50" y2="55" stroke="#94a3b8" stroke-width="2"/>
+  <!-- ombro -->
+  <line x1="40" y1="55" x2="70" y2="55" stroke="#94a3b8" stroke-width="2"/>
+  <!-- tronco/coluna -->
+  <path d="M50 55 Q48 90 50 115" stroke="#94a3b8" stroke-width="2" fill="none"/>
+  <!-- braço -->
+  <line x1="40" y1="55" x2="35" y2="110" stroke="#94a3b8" stroke-width="2"/>
+  <!-- pelve/quadril -->
+  <line x1="42" y1="115" x2="62" y2="115" stroke="#94a3b8" stroke-width="2"/>
+  <!-- perna -->
+  <line x1="50" y1="115" x2="50" y2="185" stroke="#94a3b8" stroke-width="2"/>
+  <!-- joelho -->
+  <circle cx="50" cy="155" r="4" stroke="#94a3b8" stroke-width="1.5"/>
+  <!-- pé -->
+  <line x1="50" y1="185" x2="65" y2="190" stroke="#94a3b8" stroke-width="2"/>
+</svg>

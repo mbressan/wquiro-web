@@ -3,7 +3,30 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { PainScaleEVA } from './PainScaleEVA';
 import { PainBodyMap } from './PainBodyMap';
-import { SpineMapCheckbox } from './SpineMapCheckbox';
+import { SpineMapCanvas } from './SpineMapCanvas';
+import { spineDataToUI, uiToSpinePayload } from '@/lib/spineMapAdapters';
+import type { SpineMapData } from '@/types/spineMap';
+import { PosturalAssessmentForm } from './postural/PosturalAssessmentForm';
+import { emptyPosturalAssessment } from '@/lib/posture-constants';
+import type { PosturalAssessment } from '@/types/posture';
+
+const TECHNIQUE_OPTIONS = [
+  'Diversificada', 'Thompson', 'Activator', 'Gonstead', 'Drop', 'SOT', 'Outro',
+] as const;
+
+const spineMapSchema = z
+  .object({
+    adjusted: z.array(z.string()),
+    techniques: z.array(
+      z.object({
+        vertebra: z.string(),
+        technique: z.enum(TECHNIQUE_OPTIONS),
+        notes: z.string().optional(),
+      }),
+    ),
+    notes: z.string().optional(),
+  })
+  .optional();
 
 const schema = z.object({
   chief_complaint: z.string().optional(),
@@ -16,7 +39,7 @@ const schema = z.object({
   pain_locations: z.array(z.string()).optional(),
   onset: z.enum(['gradual', 'sudden']).optional().or(z.literal('')),
   onset_date: z.string().optional(),
-  spine_adjusted: z.array(z.string()).optional(),
+  spine_map: spineMapSchema,
   subjective: z.string().optional(),
   objective: z.string().optional(),
   assessment: z.string().optional(),
@@ -29,9 +52,11 @@ interface AnamnesisFormProps {
   defaultValues?: Partial<FormData>;
   onSubmit: (data: FormData) => void;
   isLoading?: boolean;
+  posturalAssessment?: PosturalAssessment;
+  onPosturalAssessmentChange?: (value: PosturalAssessment) => void;
 }
 
-export function AnamnesisForm({ defaultValues, onSubmit, isLoading }: AnamnesisFormProps) {
+export function AnamnesisForm({ defaultValues, onSubmit, isLoading, posturalAssessment, onPosturalAssessmentChange }: AnamnesisFormProps) {
   const { register, handleSubmit, control } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: defaultValues ?? {},
@@ -103,11 +128,22 @@ export function AnamnesisForm({ defaultValues, onSubmit, isLoading }: AnamnesisF
         />
         <Controller
           control={control}
-          name="spine_adjusted"
-          defaultValue={[]}
-          render={({ field }) => (
-            <SpineMapCheckbox adjusted={field.value ?? []} onChange={field.onChange} />
-          )}
+          name="spine_map"
+          render={({ field }) => {
+            const spineData: SpineMapData = spineDataToUI(field.value);
+            return (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Mapa de Coluna — Vértebras Ajustadas
+                </label>
+                <SpineMapCanvas
+                  selected={spineData.adjusted}
+                  techniques={spineData.techniques}
+                  onChange={(data) => field.onChange(uiToSpinePayload(data))}
+                />
+              </div>
+            );
+          }}
         />
       </section>
 
@@ -120,6 +156,16 @@ export function AnamnesisForm({ defaultValues, onSubmit, isLoading }: AnamnesisF
           </div>
         ))}
       </section>
+
+      {onPosturalAssessmentChange && (
+        <div className="mt-6">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Avaliação Postural</h3>
+          <PosturalAssessmentForm
+            value={posturalAssessment ?? emptyPosturalAssessment()}
+            onChange={onPosturalAssessmentChange}
+          />
+        </div>
+      )}
 
       <button
         type="submit"
