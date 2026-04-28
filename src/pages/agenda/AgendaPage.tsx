@@ -13,11 +13,16 @@ import { AgendaCalendar } from '@/components/agenda/AgendaCalendar';
 import { AppointmentModal } from '@/components/agenda/AppointmentModal';
 import { AppointmentDetailModal } from '@/components/agenda/AppointmentDetailModal';
 import { AgendaEventModal } from '@/components/agenda/AgendaEventModal';
-import { ContextSelector } from '@/components/agenda/ContextSelector';
 import { BookingFeeAlert } from '@/components/agenda/BookingFeeAlert';
-import { ProfessionalColorDot } from '@/components/agenda/ProfessionalColorDot';
 import type { Appointment, AppointmentCreate } from '@/types/appointment';
 import type { AgendaEventCreate } from '@/types/agenda';
+
+// Fallback palette para profissionais sem cor definida no servidor
+const PROF_PALETTE = [
+  '#0d9488', '#10b981', '#06b6d4', '#f59e0b',
+  '#ef4444', '#84cc16', '#f97316', '#3b82f6',
+  '#ec4899', '#8b5cf6',
+]
 
 export default function AgendaPage() {
   const qc = useQueryClient();
@@ -95,21 +100,26 @@ export default function AgendaPage() {
     }
   }
 
-  // Map AgendaEvents to FullCalendar background events so they appear visually distinct.
   const eventBackgrounds = agendaEvents.map((ev) => ({
     id: `event-${ev.id}`,
     start: ev.start_at,
     end: ev.end_at,
-    display: 'background',
+    display: 'background' as const,
     color: '#fee2e2',
     extendedProps: { isAgendaEvent: true, title: ev.title, event_type: ev.event_type },
   }));
+
+  const isGeneralView = !agendaContext;
+  const selectedProfessional = professionals.find((p) => p.id === agendaContext);
 
   return (
     <PageContainer size="xl">
       <PageHeader
         title="Agenda"
-        subtitle="Visualize consultas, bloqueios e disponibilidade da equipe"
+        subtitle={
+          `${appointments.length} consulta${appointments.length !== 1 ? 's' : ''} no período` +
+          (selectedProfessional ? ` · ${selectedProfessional.name}` : '')
+        }
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <Button size="sm" onClick={() => setShowModal(true)}>
@@ -122,51 +132,63 @@ export default function AgendaPage() {
         }
       />
 
-      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <ContextSelector context={agendaContext} onChange={setAgendaContext} />
+      {/* Seletor de profissional — pill buttons com ponto de cor */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <button
+          onClick={() => setAgendaContext(undefined)}
+          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors border ${
+            isGeneralView
+              ? 'bg-primary-600 text-white border-primary-600'
+              : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+          }`}
+        >
+          Geral
+        </button>
 
-          {/* Toggle de visualização */}
-          <div className="inline-flex w-full overflow-hidden rounded-lg border border-gray-300 lg:w-auto">
-            {(
-              [
-                { mode: 'resourceTimeGridDay', label: 'Geral (dia)' },
-                { mode: 'timeGridWeek', label: 'Semana' },
-                { mode: 'dayGridMonth', label: 'Mês' },
-              ] as const
-            ).map(({ mode, label }) => (
-              <button
-                key={mode}
-                onClick={() => setViewMode(mode)}
-                className={`flex-1 px-3 py-2 text-sm transition-colors lg:flex-none ${
-                  viewMode === mode
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
+        {professionals.map((p, i) => {
+          const color = p.color || PROF_PALETTE[i % PROF_PALETTE.length]
+          const isActive = agendaContext === p.id
+          return (
+            <button
+              key={p.id}
+              onClick={() => setAgendaContext(p.id)}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors border leading-tight ${
+                isActive
+                  ? 'text-white border-transparent'
+                  : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+              }`}
+              style={isActive ? { backgroundColor: color, borderColor: color } : {}}
+            >
+              <span
+                className="inline-block w-2 h-2 rounded-full mr-1.5"
+                style={{ backgroundColor: isActive ? 'rgba(255,255,255,0.8)' : color }}
+              />
+              {p.name}
+            </button>
+          )
+        })}
       </div>
 
-      {/* Professional legend */}
-      {professionals.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
-          <div className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500">Profissionais</div>
-          <div className="flex flex-wrap gap-3">
-            {professionals.map((p) => (
-              <div key={p.id} className="flex items-center gap-1.5 text-sm text-gray-700">
-                <ProfessionalColorDot color={p.color} size="sm" />
+      {/* Legenda — somente na visão geral */}
+      {isGeneralView && professionals.length > 0 && (
+        <div className="flex items-center gap-4 px-1 flex-wrap">
+          <span className="text-xs font-medium text-gray-500">Profissionais:</span>
+          {professionals.map((p, i) => {
+            const color = p.color || PROF_PALETTE[i % PROF_PALETTE.length]
+            return (
+              <span key={p.id} className="flex items-center gap-1.5 text-xs text-gray-500">
+                <span
+                  className="inline-block w-2.5 h-2.5 rounded-full shrink-0"
+                  style={{ backgroundColor: color }}
+                />
                 {p.name}
-              </div>
-            ))}
-          </div>
+              </span>
+            )
+          })}
         </div>
       )}
 
-      {/* Booking fee alerts */}
+      {/* Alertas de taxa de agendamento */}
       <div className="space-y-2">
         {appointments
           .filter((a) => a.booking_fee_required && !a.booking_fee_paid)
@@ -179,7 +201,10 @@ export default function AgendaPage() {
       <AgendaCalendar
         appointments={appointments}
         professionals={professionals}
+        profPalette={PROF_PALETTE}
         viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        agendaContext={agendaContext}
         backgroundEvents={eventBackgrounds}
         onDatesChange={handleDatesChange}
         onDateClick={(date) => {
@@ -225,4 +250,3 @@ export default function AgendaPage() {
     </PageContainer>
   );
 }
-
