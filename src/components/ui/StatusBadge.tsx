@@ -1,6 +1,6 @@
 // StatusBadge — badge semântico unificado para appointment, record type e invite
 
-type AppointmentStatus =
+export type AppointmentStatus =
   | 'pending_payment'
   | 'scheduled'
   | 'confirmed'
@@ -9,7 +9,7 @@ type AppointmentStatus =
   | 'cancelled'
   | 'no_show';
 
-type RecordType = 'anamnesis' | 'follow_up' | 'reevaluation' | 'discharge';
+export type RecordType = 'anamnesis' | 'follow_up' | 'reevaluation' | 'discharge';
 
 type InviteStatus = 'accepted' | 'cancelled' | 'pending' | 'expired';
 

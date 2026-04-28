@@ -69,6 +69,7 @@ export const router = createBrowserRouter([
         children: [
           {
             path: '/',
+            handle: { title: 'Dashboard' },
             element: (
               <Suspense fallback={<Loading />}>
                 <DashboardPage />
@@ -77,6 +78,7 @@ export const router = createBrowserRouter([
           },
           {
             path: '/pacientes',
+            handle: { title: 'Pacientes' },
             element: (
               <Suspense fallback={<Loading />}>
                 <PacientesListPage />
@@ -85,6 +87,7 @@ export const router = createBrowserRouter([
           },
           {
             path: '/pacientes/:id',
+            handle: { title: 'Paciente' },
             element: (
               <Suspense fallback={<Loading />}>
                 <PacienteDetalhePage />
@@ -93,6 +96,7 @@ export const router = createBrowserRouter([
           },
           {
             path: '/agenda',
+            handle: { title: 'Agenda' },
             element: (
               <Suspense fallback={<Loading />}>
                 <AgendaPage />
@@ -101,6 +105,7 @@ export const router = createBrowserRouter([
           },
           {
             path: '/pacientes/:patientId/consultas',
+            handle: { title: 'Consultas' },
             element: (
               <Suspense fallback={<Loading />}>
                 <PatientConsultasPage />
@@ -109,6 +114,7 @@ export const router = createBrowserRouter([
           },
           {
             path: '/pacientes/:patientId/prontuario',
+            handle: { title: 'Prontuários' },
             element: (
               <Suspense fallback={<Loading />}>
                 <PatientProntuarioPage />
@@ -117,6 +123,7 @@ export const router = createBrowserRouter([
           },
           {
             path: '/prontuario/:id',
+            handle: { title: 'Prontuário' },
             element: (
               <Suspense fallback={<Loading />}>
                 <ProntuarioPage />
@@ -125,6 +132,7 @@ export const router = createBrowserRouter([
           },
           {
             path: '/financeiro/caixa',
+            handle: { title: 'Caixa' },
             element: (
               <Suspense fallback={<Loading />}>
                 <CaixaPage />
@@ -133,6 +141,7 @@ export const router = createBrowserRouter([
           },
           {
             path: '/financeiro/dashboard',
+            handle: { title: 'Financeiro' },
             element: (
               <Suspense fallback={<Loading />}>
                 <FinanceiroDashboardPage />
@@ -141,6 +150,7 @@ export const router = createBrowserRouter([
           },
           {
             path: '/profissionais',
+            handle: { title: 'Profissionais' },
             element: (
               <Suspense fallback={<Loading />}>
                 <ProfissionaisPage />
@@ -149,6 +159,7 @@ export const router = createBrowserRouter([
           },
           {
             path: '/pacientes/:patientId/postural',
+            handle: { title: 'Histórico Postural' },
             element: (
               <Suspense fallback={<Loading />}>
                 <PosturalHistoricoPage />
@@ -157,6 +168,7 @@ export const router = createBrowserRouter([
           },
           {
             path: '/configuracoes',
+            handle: { title: 'Configurações' },
             element: (
               <Suspense fallback={<Loading />}>
                 <ConfiguracoesPage />

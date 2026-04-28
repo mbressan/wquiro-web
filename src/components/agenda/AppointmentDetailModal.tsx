@@ -4,6 +4,7 @@ import { Pencil, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Modal, StatusBadge, AppointmentTypeBadge, Button } from '@/components/ui';
+import type { AppointmentStatus } from '@/components/ui';
 import { useCheckin } from '@/hooks/useAppointments';
 import type { Appointment } from '@/types/appointment';
 
@@ -81,7 +82,7 @@ export function AppointmentDetailModal({ appointment, onClose, onEdit }: Appoint
         </div>
         <div className="flex justify-between items-center">
           <dt className="font-medium text-gray-500">Status</dt>
-          <dd><StatusBadge type="appointment" status={appointment.status as any} /></dd>
+          <dd><StatusBadge type="appointment" status={appointment.status as AppointmentStatus} /></dd>
         </div>
       </dl>
     </Modal>

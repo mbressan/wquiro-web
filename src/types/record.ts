@@ -1,3 +1,5 @@
+import type { PosturalAssessment } from './posture';
+
 export type RecordType = 'anamnesis' | 'follow_up' | 'reevaluation' | 'discharge';
 
 export interface SpineMap {
@@ -35,6 +37,7 @@ export interface AnamnesisClinicalData {
   spine_map?: SpineMap;
   leg_check?: LegCheck;
   derifield?: Derifield;
+  posture_assessment?: PosturalAssessment;
 }
 
 export interface FollowUpClinicalData {

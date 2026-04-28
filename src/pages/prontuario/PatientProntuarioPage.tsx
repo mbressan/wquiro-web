@@ -2,6 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { FileText, ChevronRight, AlertCircle } from 'lucide-react';
 import { usePatientRecords } from '@/hooks/useRecords';
 import { PageHeaderBack, StatusBadge, PageContainer, SkeletonCardList } from '@/components/ui';
+import type { RecordType } from '@/components/ui';
 import type { ClinicalRecordListItem } from '@/types/record';
 
 function RecordCard({ record }: { record: ClinicalRecordListItem }) {
@@ -23,7 +24,7 @@ function RecordCard({ record }: { record: ClinicalRecordListItem }) {
                 year: 'numeric',
               })}
             </span>
-            <StatusBadge type="record" status={record.record_type as any} />
+            <StatusBadge type="record" status={record.record_type as RecordType} />
             {record.pain_scale !== null && (
               <span className="text-xs text-orange-600">EVA {record.pain_scale}/10</span>
             )}

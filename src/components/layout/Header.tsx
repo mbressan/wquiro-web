@@ -1,4 +1,4 @@
-import { Bell, ChevronDown, LogOut, User } from 'lucide-react'
+import { Bell, ChevronDown, LogOut, Menu, User } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useAuthStore } from '@/stores/authStore'
 import { useLogout } from '@/hooks/useAuth'
@@ -69,12 +69,19 @@ function UserMenu() {
 
 interface HeaderProps {
   title?: string
+  onMenuClick?: () => void
 }
 
-export function Header({ title }: HeaderProps) {
+export function Header({ title, onMenuClick }: HeaderProps) {
   return (
     <header className="flex h-15 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-6">
-      <div>
+      <div className="flex items-center">
+        <button
+          onClick={onMenuClick}
+          className="mr-3 rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
         {title && (
           <h1 className="text-base font-semibold text-gray-900">{title}</h1>
         )}

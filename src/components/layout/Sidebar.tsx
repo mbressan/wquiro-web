@@ -139,53 +139,73 @@ function NavGroup({ icon: Icon, label, children }: NavGroupProps) {
   )
 }
 
-export function Sidebar() {
+interface SidebarProps {
+  sidebarOpen?: boolean
+  onClose?: () => void
+}
+
+export function Sidebar({ sidebarOpen = false, onClose }: SidebarProps) {
   const clinic = useAuthStore((s) => s.clinic)
 
   return (
-    <aside className="flex h-full w-60 shrink-0 flex-col border-r border-gray-200 bg-white">
-      {/* Logo */}
-      <div className="flex h-15 items-center gap-2.5 border-b border-gray-100 px-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600">
-          <Activity className="h-4 w-4 text-white" />
-        </div>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-gray-900">wQuiro</p>
-          {clinic && (
-            <p className="truncate text-xs text-gray-400">{clinic.name}</p>
-          )}
-        </div>
-      </div>
+    <>
+      {/* Overlay mobile */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+          onClick={onClose}
+        />
+      )}
 
-      {/* Nav principal */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
-        <div className="space-y-0.5">
-          {navItems.map((item) =>
-            item.children ? (
-              <NavGroup
-                key={item.label}
-                icon={item.icon!}
-                label={item.label}
-                children={item.children}
-              />
-            ) : (
-              <NavItem
-                key={item.to!}
-                icon={item.icon}
-                label={item.label}
-                to={item.to!}
-                end={item.end}
-              />
-            ),
-          )}
+      {/* Sidebar */}
+      <aside className={[
+        'flex h-full w-60 shrink-0 flex-col border-r border-gray-200 bg-white',
+        'fixed inset-y-0 left-0 z-50 transition-transform duration-200 lg:static lg:translate-x-0',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+      ].join(' ')}>
+        {/* Logo */}
+        <div className="flex h-15 items-center gap-2.5 border-b border-gray-100 px-4">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600">
+            <Activity className="h-4 w-4 text-white" />
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-gray-900">wQuiro</p>
+            {clinic && (
+              <p className="truncate text-xs text-gray-400">{clinic.name}</p>
+            )}
+          </div>
         </div>
 
-        <div className="mt-6 border-t border-gray-100 pt-4 space-y-0.5">
-          {bottomItems.map((item) => (
-            <NavItem key={item.to} icon={item.icon} label={item.label} to={item.to} />
-          ))}
-        </div>
-      </nav>
-    </aside>
+        {/* Nav principal */}
+        <nav className="flex-1 overflow-y-auto px-3 py-4">
+          <div className="space-y-0.5">
+            {navItems.map((item) =>
+              item.children ? (
+                <NavGroup
+                  key={item.label}
+                  icon={item.icon!}
+                  label={item.label}
+                  children={item.children}
+                />
+              ) : (
+                <NavItem
+                  key={item.to!}
+                  icon={item.icon}
+                  label={item.label}
+                  to={item.to!}
+                  end={item.end}
+                />
+              ),
+            )}
+          </div>
+
+          <div className="mt-6 border-t border-gray-100 pt-4 space-y-0.5">
+            {bottomItems.map((item) => (
+              <NavItem key={item.to} icon={item.icon} label={item.label} to={item.to} />
+            ))}
+          </div>
+        </nav>
+      </aside>
+    </>
   )
 }

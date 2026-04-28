@@ -1,8 +1,15 @@
 import axios from 'axios'
 import { useAuthStore } from '@/stores/authStore'
+import { navigateTo } from '@/lib/navigation'
+
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api/v1'
+
+if (!import.meta.env.VITE_API_URL && import.meta.env.PROD) {
+  console.warn('[api] VITE_API_URL não definido — usando fallback localhost. Configure a variável em produção.')
+}
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api/v1',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -29,13 +36,13 @@ api.interceptors.response.use(
       const refreshToken = useAuthStore.getState().refreshToken
       if (!refreshToken) {
         useAuthStore.getState().logout()
-        window.location.href = '/login'
+        navigateTo('/login')
         return Promise.reject(error)
       }
 
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api/v1'}/auth/refresh/`,
+          `${API_BASE_URL}/auth/refresh/`,
           { refresh: refreshToken },
         )
 
@@ -47,7 +54,7 @@ api.interceptors.response.use(
         return api(originalRequest)
       } catch {
         useAuthStore.getState().logout()
-        window.location.href = '/login'
+        navigateTo('/login')
         return Promise.reject(error)
       }
     }

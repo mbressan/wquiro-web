@@ -3,6 +3,7 @@ import { CalendarDays, ChevronRight, AlertCircle, FileText, Play } from 'lucide-
 import { toast } from 'sonner';
 import { useAppointments, useCheckin } from '@/hooks/useAppointments';
 import { PageHeaderBack, StatusBadge, AppointmentTypeBadge, Button, PageContainer, SkeletonCardList } from '@/components/ui';
+import type { AppointmentStatus } from '@/components/ui';
 import type { Appointment } from '@/types/appointment';
 
 function AppointmentCard({ appt }: { appt: Appointment }) {
@@ -36,7 +37,7 @@ function AppointmentCard({ appt }: { appt: Appointment }) {
             <span className="text-sm text-gray-500">
               {date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
             </span>
-            <StatusBadge type="appointment" status={appt.status as any} />
+            <StatusBadge type="appointment" status={appt.status as AppointmentStatus} />
             {appt.appointment_type && (
               <AppointmentTypeBadge appointmentType={appt.appointment_type} />
             )}

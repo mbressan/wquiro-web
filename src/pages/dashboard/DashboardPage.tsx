@@ -1,10 +1,12 @@
 import { Users, CalendarDays, DollarSign, TrendingUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { PageContainer } from '@/components/ui'
+import { PageContainer, Skeleton } from '@/components/ui'
+import { useFinancialDashboard } from '@/hooks/useFinancial'
+import { usePatients } from '@/hooks/usePatients'
 
 interface StatCardProps {
   label: string
-  value: string | number
+  value: React.ReactNode
   icon: React.ElementType
   trend?: string
   trendUp?: boolean
@@ -33,25 +35,34 @@ function StatCard({ label, value, icon: Icon, trend, trendUp, color }: StatCardP
 }
 
 export function DashboardPage() {
+  const { data: financial, isLoading: loadingFinancial } = useFinancialDashboard()
+  const { data: patientsData, isLoading: loadingPatients } = usePatients({ page_size: 1 })
+
   return (
     <PageContainer size="xl">
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
           label="Pacientes ativos"
-          value="—"
+          value={loadingPatients ? <Skeleton className="h-6 w-12" /> : patientsData?.count ?? '—'}
           icon={Users}
           color="bg-primary-600"
         />
         <StatCard
           label="Consultas hoje"
-          value="—"
+          value={loadingFinancial ? <Skeleton className="h-6 w-12" /> : financial?.appointments_today ?? '—'}
           icon={CalendarDays}
           color="bg-violet-500"
         />
         <StatCard
           label="Receita do mês"
-          value="—"
+          value={
+            loadingFinancial
+              ? <Skeleton className="h-6 w-20" />
+              : financial
+                ? `R$ ${Number(financial.revenue_month).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+                : '—'
+          }
           icon={DollarSign}
           color="bg-emerald-500"
         />

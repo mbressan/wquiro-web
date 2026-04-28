@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Download, Phone, Mail, MapPin, CalendarDays, FileText, Activity, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { usePatient, useUpdatePatient } from '@/hooks/usePatients';
+import api from '@/lib/api';
 import { PatientForm } from '@/components/pacientes/PatientForm';
 import { PatientTimeline } from '@/components/pacientes/PatientTimeline';
 import { TagBadge } from '@/components/pacientes/TagBadge';
@@ -15,6 +16,26 @@ export default function PacienteDetalhePage() {
   const { data: patient, isLoading } = usePatient(id!);
   const updatePatient = useUpdatePatient(id!);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [exporting, setExporting] = useState(false);
+
+  async function handleExport() {
+    try {
+      setExporting(true);
+      const response = await api.get(`/pacientes/${patient?.id}/export/`, { responseType: 'blob' });
+      const url = URL.createObjectURL(response.data as Blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `paciente-${(patient?.name ?? 'dados').replace(/\s+/g, '-')}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error('Erro ao exportar dados LGPD.');
+    } finally {
+      setExporting(false);
+    }
+  }
 
   function handleUpdate(data: PatientCreate) {
     updatePatient.mutate(data, {
@@ -79,15 +100,14 @@ export default function PacienteDetalhePage() {
             <Button size="sm" variant="secondary" onClick={() => setShowEditModal(true)}>
               Editar
             </Button>
-            <a
-              href={`/api/v1/pacientes/${patient.id}/export/`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
+            <button
+              onClick={handleExport}
+              disabled={exporting}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
             >
               <Download className="h-4 w-4" />
-              Exportar LGPD
-            </a>
+              {exporting ? 'Exportando...' : 'Exportar LGPD'}
+            </button>
           </div>
         }
       />

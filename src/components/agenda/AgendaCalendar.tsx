@@ -9,11 +9,20 @@ import { AppointmentMonthCard } from './AppointmentMonthCard';
 import type { ViewMode } from '@/hooks/useAgendaView';
 import type { Appointment, Professional } from '@/types/appointment';
 
+interface BackgroundEvent {
+  id: string
+  start: string
+  end: string
+  display: 'background'
+  color?: string
+  extendedProps?: Record<string, unknown>
+}
+
 interface AgendaCalendarProps {
   appointments: Appointment[];
   professionals: Professional[];
   viewMode: ViewMode;
-  backgroundEvents?: object[];
+  backgroundEvents?: BackgroundEvent[];
   onDateClick?: (date: string) => void;
   onEventClick?: (appointment: Appointment) => void;
   onEventDrop?: (appointmentId: string, newStart: string, newEnd: string, revert: () => void) => void;
