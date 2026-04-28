@@ -169,24 +169,6 @@ export default function AgendaPage() {
         })}
       </div>
 
-      {/* Legenda — somente na visão geral */}
-      {isGeneralView && professionals.length > 0 && (
-        <div className="flex items-center gap-4 px-1 flex-wrap">
-          <span className="text-xs font-medium text-gray-500">Profissionais:</span>
-          {professionals.map((p, i) => {
-            const color = p.color || PROF_PALETTE[i % PROF_PALETTE.length]
-            return (
-              <span key={p.id} className="flex items-center gap-1.5 text-xs text-gray-500">
-                <span
-                  className="inline-block w-2.5 h-2.5 rounded-full shrink-0"
-                  style={{ backgroundColor: color }}
-                />
-                {p.name}
-              </span>
-            )
-          })}
-        </div>
-      )}
 
       {/* Alertas de taxa de agendamento */}
       <div className="space-y-2">

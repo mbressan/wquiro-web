@@ -6,18 +6,9 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { AppointmentMonthCard } from './AppointmentMonthCard';
 import type { ViewMode } from '@/hooks/useAgendaView';
-import type { Appointment, AppointmentStatus, Professional } from '@/types/appointment';
+import type { Appointment, Professional } from '@/types/appointment';
 import type { AgendaContext } from '@/types/agenda';
 
-// Cores por status — usadas na visão individual (um profissional selecionado)
-const STATUS_COLORS: Record<AppointmentStatus, string> = {
-  pending_payment: '#fbbf24', // amber
-  scheduled:       '#38bdf8', // sky
-  in_progress:     '#0d9488', // teal
-  completed:       '#94a3b8', // slate
-  cancelled:       '#f87171', // red
-  no_show:         '#fb923c', // orange
-}
 
 interface BackgroundEvent {
   id: string
@@ -57,27 +48,23 @@ export function AgendaCalendar({
 }: AgendaCalendarProps) {
   const calendarRef = useRef<FullCalendar>(null);
   const isResourceView = viewMode === 'resourceTimeGridDay';
-  const isGeneralView = !agendaContext;
-
   // Troca de view de forma imperativa quando a prop muda
   useEffect(() => {
     calendarRef.current?.getApi().changeView(viewMode);
   }, [viewMode]);
 
-  const resources = professionals.map((p, i) => ({
+  const resources = professionals.map((p) => ({
     id: p.id,
     title: p.name,
-    eventColor: p.color || profPalette[i % profPalette.length],
   }));
 
   const events = [
     ...appointments.map((a) => {
-      const profColor = professionals.find((p) => p.id === a.professional)?.color
-        ?? profPalette[professionals.findIndex((p) => p.id === a.professional) % profPalette.length]
-        ?? '#3b82f6';
-      const color = isGeneralView
-        ? profColor
-        : (STATUS_COLORS[a.extendedProps.status] ?? profColor);
+      const profIdx = professionals.findIndex((p) => p.id === a.professional);
+      const color =
+        professionals[profIdx]?.color ||
+        profPalette[Math.max(0, profIdx) % profPalette.length] ||
+        '#3b82f6';
       return {
         id: a.id,
         resourceId: a.resourceId,
@@ -86,7 +73,7 @@ export function AgendaCalendar({
         end: a.end,
         backgroundColor: color,
         borderColor: color,
-        editable: !['completed', 'cancelled', 'no_show'].includes(a.extendedProps.status),
+        editable: !['completed', 'cancelled', 'no_show'].includes(a.status),
         extendedProps: { ...a.extendedProps, _appointment: a },
       };
     }),
@@ -148,12 +135,11 @@ export function AgendaCalendar({
             if (!appt) return null;
 
             if (viewMode === 'dayGridMonth') {
-              const profColor = professionals.find((p) => p.id === appt.professional)?.color
-                ?? profPalette[professionals.findIndex((p) => p.id === appt.professional) % profPalette.length]
-                ?? '#3b82f6';
-              const color = isGeneralView
-                ? profColor
-                : (STATUS_COLORS[appt.extendedProps.status] ?? profColor);
+              const profIdx2 = professionals.findIndex((p) => p.id === appt.professional);
+              const color =
+                professionals[profIdx2]?.color ||
+                profPalette[Math.max(0, profIdx2) % profPalette.length] ||
+                '#3b82f6';
               return <AppointmentMonthCard appointment={appt} professionalColor={color} />;
             }
 
