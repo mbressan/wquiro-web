@@ -39,7 +39,7 @@ export function AgendaCalendar({
   profPalette,
   viewMode,
   onViewModeChange,
-  agendaContext,
+  agendaContext: _agendaContext,
   backgroundEvents = [],
   onDateClick,
   onEventClick,

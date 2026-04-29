@@ -7,8 +7,8 @@ import { setNavigate } from '@/lib/navigation'
 
 export function DashboardLayout() {
   const matches = useMatches()
-  const title = [...matches].reverse().find(m => (m.handle as { title?: string })?.title)
-    ?.handle?.['title'] as string ?? 'QuiroGestão'
+  const title = ([...matches].reverse().find(m => (m.handle as { title?: string })?.title)
+    ?.handle as { title?: string } | undefined)?.title ?? 'QuiroGestão'
 
   const navigate = useNavigate()
   useEffect(() => { setNavigate(navigate) }, [navigate])

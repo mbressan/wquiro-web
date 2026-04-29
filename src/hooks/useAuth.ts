@@ -14,7 +14,7 @@ export function useLogin() {
     },
     onSuccess: (data) => {
       setTokens(data.access, data.refresh)
-      setUser(data.user, data.clinic)
+      setUser(data.user, data.clinic, data.subscription ?? null)
       queryClient.invalidateQueries({ queryKey: ['me'] })
     },
   })
@@ -55,7 +55,7 @@ export function useMe() {
     enabled: !!accessToken,
     onSuccess: (data: MeResponse) => {
       if (data.user && data.clinic) {
-        setUser(data.user, data.clinic)
+        setUser(data.user, data.clinic, data.subscription ?? null)
       }
     },
   } as Parameters<typeof useQuery>[0])

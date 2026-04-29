@@ -9,9 +9,13 @@ import { SOAPForm } from '@/components/prontuario/SOAPForm';
 import { ExamUpload } from '@/components/prontuario/ExamUpload';
 import { PatientHistoryPanel } from '@/components/prontuario/PatientHistoryPanel';
 import { PosturalAssessmentForm } from '@/components/prontuario/postural/PosturalAssessmentForm';
+import RecordingButton from '@/components/prontuario/RecordingButton';
+import TranscriptionReview from '@/components/prontuario/TranscriptionReview';
 import { emptyPosturalAssessment } from '@/lib/posture-constants';
 import type { PosturalAssessment } from '@/types/posture';
 import type { AnamnesisClinicalData, ClinicalData, FollowUpClinicalData, SpineMap } from '@/types/record';
+import type { ConsultationRecording } from '@/types/recording';
+import { useAuthStore } from '@/stores/authStore';
 
 
 export default function ProntuarioPage() {
@@ -24,6 +28,9 @@ export default function ProntuarioPage() {
   const [posturalAssessment, setPosturalAssessment] = useState<PosturalAssessment | undefined>(
     undefined,
   );
+  const [activeRecordingId, setActiveRecordingId] = useState<string | null>(null);
+  const subscription = useAuthStore((s) => s.subscription);
+  const hasAi = subscription?.plan?.has_ai ?? false;
 
   // Initialise posturalAssessment from loaded record (only once)
   const resolvedPostural =
@@ -173,6 +180,27 @@ export default function ProntuarioPage() {
               <ExamUpload recordId={record.id} exams={record.exam_files} />
             </div>
           </div>
+
+          {hasAi && (
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="border-b border-gray-100 px-4 py-3">
+                <h3 className="text-sm font-semibold text-gray-900">Gravação e Transcrição</h3>
+              </div>
+              <div className="p-4 space-y-4">
+                <RecordingButton
+                  clinicalRecordId={record.id}
+                  onRecordingUploaded={(rec: ConsultationRecording) => setActiveRecordingId(rec.id)}
+                />
+                {activeRecordingId && (
+                  <TranscriptionReview
+                    recordingId={activeRecordingId}
+                    clinicalRecordId={record.id}
+                    onApplied={() => setActiveRecordingId(null)}
+                  />
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </PageContainer>

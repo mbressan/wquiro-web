@@ -1,10 +1,9 @@
 import type { PosturalAssessment } from './posture';
+import type { SpineMapData } from './spineMap';
 
 export type RecordType = 'anamnesis' | 'follow_up' | 'reevaluation' | 'discharge';
 
-export interface SpineMap {
-  adjusted: string[];
-}
+export type SpineMap = SpineMapData;
 
 export interface LegCheck {
   prone_short_leg: 'left' | 'right' | 'equal';

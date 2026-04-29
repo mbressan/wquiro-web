@@ -1,17 +1,16 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import type { User, Clinic } from '@/types/auth'
-import type { SubscriptionCurrent } from '@/types/subscription'
+import type { User, Clinic, AuthSubscription } from '@/types/auth'
 
 interface AuthState {
   accessToken: string | null
   refreshToken: string | null
   user: User | null
   clinic: Clinic | null
-  subscription: SubscriptionCurrent | null
+  subscription: AuthSubscription | null
   setTokens: (access: string, refresh: string) => void
-  setUser: (user: User, clinic: Clinic, subscription?: SubscriptionCurrent | null) => void
-  setSubscription: (subscription: SubscriptionCurrent | null) => void
+  setUser: (user: User, clinic: Clinic, subscription?: AuthSubscription | null) => void
+  setSubscription: (subscription: AuthSubscription | null) => void
   logout: () => void
 }
 
