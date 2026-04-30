@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Download, Phone, Mail, MapPin, CalendarDays, FileText, Activity, ChevronRight } from 'lucide-react';
+import { Download, Phone, Mail, MapPin, CalendarDays, FileText, Activity, ChevronRight, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { usePatient, useUpdatePatient } from '@/hooks/usePatients';
 import api from '@/lib/api';
 import { PatientForm } from '@/components/pacientes/PatientForm';
 import { PatientTimeline } from '@/components/pacientes/PatientTimeline';
 import { TagBadge } from '@/components/pacientes/TagBadge';
+import WhatsAppHistoryTab from '@/components/pacientes/WhatsAppHistoryTab';
 import { Button, Modal, PageHeaderBack, PageContainer, SkeletonPage } from '@/components/ui';
 import type { PatientCreate } from '@/types/patient';
 
@@ -17,6 +18,7 @@ export default function PacienteDetalhePage() {
   const updatePatient = useUpdatePatient(id!);
   const [showEditModal, setShowEditModal] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [showWhatsApp, setShowWhatsApp] = useState(false);
 
   async function handleExport() {
     try {
@@ -82,6 +84,7 @@ export default function PacienteDetalhePage() {
       description: 'Avaliações posturais comparativas',
     },
   ];
+
 
   return (
     <PageContainer size="md">
@@ -194,12 +197,25 @@ export default function PacienteDetalhePage() {
                   <ChevronRight className="h-4 w-4 shrink-0 text-gray-400" />
                 </button>
               ))}
+              <button
+                onClick={() => setShowWhatsApp((v) => !v)}
+                className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50"
+              >
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary-50">
+                  <MessageCircle className="h-4 w-4 text-primary-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900">WhatsApp</p>
+                  <p className="text-xs text-gray-500">Histórico de mensagens</p>
+                </div>
+                <ChevronRight className="h-4 w-4 shrink-0 text-gray-400" />
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Coluna direita — Timeline */}
-        <div className="lg:col-span-2">
+        {/* Coluna direita — Timeline + WhatsApp */}
+        <div className="lg:col-span-2 space-y-4">
           <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
             <div className="border-b border-gray-100 px-4 py-3">
               <h2 className="text-sm font-semibold text-gray-900">Histórico</h2>
@@ -208,6 +224,17 @@ export default function PacienteDetalhePage() {
               <PatientTimeline events={patient.timeline} />
             </div>
           </div>
+
+          {showWhatsApp && (
+            <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+              <div className="border-b border-gray-100 px-4 py-3">
+                <h2 className="text-sm font-semibold text-gray-900">WhatsApp</h2>
+              </div>
+              <div className="px-4 py-4">
+                <WhatsAppHistoryTab patientId={patient.id} />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

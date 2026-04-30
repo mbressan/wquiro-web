@@ -2,7 +2,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { useSubscriptionCurrent } from '@/hooks/useSubscription';
 import { useLogout } from '@/hooks/useAuth';
 import { PageContainer, PageHeader, Button, SkeletonText } from '@/components/ui';
-import { Building2, User, CreditCard, LogOut } from 'lucide-react';
+import { Building2, User, CreditCard, LogOut, MessageCircle, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 function UsageBar({ current, limit, label }: { current: number; limit: number; label: string }) {
@@ -148,6 +148,20 @@ export default function ConfiguracoesPage() {
         ) : (
           <SkeletonText lines={3} />
         )}
+      </Section>
+
+      {/* WhatsApp */}
+      <Section title="WhatsApp" icon={MessageCircle}>
+        <button
+          onClick={() => navigate('/configuracoes/whatsapp')}
+          className="flex w-full items-center justify-between rounded-lg px-1 py-2 text-left transition-colors hover:bg-gray-50"
+        >
+          <div>
+            <p className="text-sm font-medium text-gray-900">Configurar integração WhatsApp</p>
+            <p className="text-xs text-gray-500">Conecte sua instância Evolution API e gerencie notificações</p>
+          </div>
+          <ChevronRight className="h-4 w-4 shrink-0 text-gray-400" />
+        </button>
       </Section>
 
       {/* Ações */}

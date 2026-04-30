@@ -28,6 +28,7 @@ const FinanceiroDashboardPage = lazy(() => import('@/pages/financeiro/Financeiro
 const ProfissionaisPage = lazy(() => import('@/pages/profissionais/ProfissionaisPage'))
 const PosturalHistoricoPage = lazy(() => import('@/pages/prontuario/PosturalHistoricoPage'))
 const ConfiguracoesPage = lazy(() => import('@/pages/configuracoes/ConfiguracoesPage'))
+const WhatsAppConfigPage = lazy(() => import('@/pages/configuracoes/WhatsAppConfigPage'))
 
 const Loading = () => <SkeletonPage />
 
@@ -172,6 +173,15 @@ export const router = createBrowserRouter([
             element: (
               <Suspense fallback={<Loading />}>
                 <ConfiguracoesPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: '/configuracoes/whatsapp',
+            handle: { title: 'WhatsApp' },
+            element: (
+              <Suspense fallback={<Loading />}>
+                <WhatsAppConfigPage />
               </Suspense>
             ),
           },
