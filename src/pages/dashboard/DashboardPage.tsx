@@ -1,76 +1,57 @@
-import { Users, CalendarDays, DollarSign, TrendingUp } from 'lucide-react'
+import { Users, CalendarDays, DollarSign, TrendingUp, BarChart2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { PageContainer, Skeleton } from '@/components/ui'
-import { useFinancialDashboard } from '@/hooks/useFinancial'
-import { usePatients } from '@/hooks/usePatients'
-
-interface StatCardProps {
-  label: string
-  value: React.ReactNode
-  icon: React.ElementType
-  trend?: string
-  trendUp?: boolean
-  color: string
-}
-
-function StatCard({ label, value, icon: Icon, trend, trendUp, color }: StatCardProps) {
-  return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm text-gray-500">{label}</p>
-          <p className="mt-1.5 text-2xl font-semibold text-gray-900">{value}</p>
-          {trend && (
-            <p className={['mt-1 text-xs', trendUp ? 'text-emerald-600' : 'text-red-500'].join(' ')}>
-              {trend}
-            </p>
-          )}
-        </div>
-        <div className={['rounded-lg p-2.5', color].join(' ')}>
-          <Icon className="h-5 w-5 text-white" />
-        </div>
-      </div>
-    </div>
-  )
-}
+import { PageContainer } from '@/components/ui'
+import { CardWithHeader } from '@/components/ui/Card'
+import { useAuthStore } from '@/stores/authStore'
+import { KPICard } from '@/components/relatorios/KPICard'
+import { RevenueChart } from '@/components/relatorios/RevenueChart'
+import { useHomeKPIs } from '@/hooks/useRelatorios'
 
 export function DashboardPage() {
-  const { data: financial, isLoading: loadingFinancial } = useFinancialDashboard()
-  const { data: patientsData, isLoading: loadingPatients } = usePatients({ page_size: 1 })
+  const { data, isLoading } = useHomeKPIs()
+  const user = useAuthStore((state) => state.user)
+  const isAdmin = user?.role === 'admin'
+
+  // Build last-7-days revenue data from home-kpis if available (placeholder if missing)
+  const revenueData = data
+    ? [{ date: new Date().toISOString().substring(0, 10), amount: data.revenue_today }]
+    : []
 
   return (
     <PageContainer size="xl">
-      {/* Stats */}
+      {/* KPI grid */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard
-          label="Pacientes ativos"
-          value={loadingPatients ? <Skeleton className="h-6 w-12" /> : patientsData?.count ?? '—'}
+        <KPICard
+          title="Pacientes ativos"
+          value={data?.active_patients ?? 0}
           icon={Users}
-          color="bg-primary-600"
+          loading={isLoading}
+          format="number"
+          isStale={data?.isStale}
         />
-        <StatCard
-          label="Consultas hoje"
-          value={loadingFinancial ? <Skeleton className="h-6 w-12" /> : financial?.appointments_today ?? '—'}
+        <KPICard
+          title="Consultas hoje"
+          value={data?.appointments_today ?? 0}
           icon={CalendarDays}
-          color="bg-violet-500"
+          loading={isLoading}
+          format="number"
+          isStale={data?.isStale}
         />
-        <StatCard
-          label="Receita do mês"
-          value={
-            loadingFinancial
-              ? <Skeleton className="h-6 w-20" />
-              : financial
-                ? `R$ ${Number(financial.revenue_month).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
-                : '—'
-          }
+        <KPICard
+          title="Receita do mês"
+          value={data?.revenue_month ?? '0'}
           icon={DollarSign}
-          color="bg-emerald-500"
+          loading={isLoading}
+          format="currency"
+          isStale={data?.isStale}
         />
-        <StatCard
-          label="Taxa de comparecimento"
-          value="—"
+        <KPICard
+          title="Ticket médio"
+          value={data?.avg_ticket_month ?? '0'}
           icon={TrendingUp}
-          color="bg-amber-500"
+          loading={isLoading}
+          format="currency"
+          isStale={data?.isStale}
         />
       </div>
 
@@ -124,9 +105,29 @@ export function DashboardPage() {
               <DollarSign className="h-4 w-4 text-primary-600" />
               Registrar pagamento
             </Link>
+            {isAdmin && (
+              <Link
+                to="/relatorios"
+                className="flex items-center gap-3 rounded-lg border border-gray-100 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:border-primary-200 hover:bg-primary-50 hover:text-primary-700"
+              >
+                <BarChart2 className="h-4 w-4 text-primary-600" />
+                Ver relatórios
+              </Link>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Mini revenue chart — admin only */}
+      {isAdmin && revenueData.length > 1 && (
+        <CardWithHeader title="Receita (últimos dias)" action={
+          <Link to="/relatorios" className="text-xs font-medium text-primary-600 hover:underline">
+            Ver relatório completo →
+          </Link>
+        }>
+          <RevenueChart data={revenueData} period="week" />
+        </CardWithHeader>
+      )}
     </PageContainer>
   )
 }
