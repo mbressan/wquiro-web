@@ -4,6 +4,12 @@ export interface User {
   email: string
   role: 'admin' | 'professional' | 'receptionist'
   phone?: string
+  color?: string
+  notes?: string
+  commission_percentage?: string | null
+  is_active?: boolean
+  specialties?: { id: string; name: string; is_predefined: boolean }[]
+  created_at?: string
 }
 
 export interface Clinic {
@@ -11,6 +17,11 @@ export interface Clinic {
   name: string
   slug: string
   email?: string
+  phone?: string
+  address?: string
+  booking_fee_enabled?: boolean
+  booking_fee_amount?: string
+  booking_fee_deadline_hours?: number
 }
 
 export interface AuthSubscription {
