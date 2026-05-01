@@ -1,11 +1,11 @@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Pencil, Play } from 'lucide-react';
+import { Bell, FileText, Pencil, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Modal, StatusBadge, AppointmentTypeBadge, Button } from '@/components/ui';
 import type { AppointmentStatus } from '@/components/ui';
-import { useCheckin } from '@/hooks/useAppointments';
+import { useCallPatient, useCheckin } from '@/hooks/useAppointments';
 import type { Appointment } from '@/types/appointment';
 
 interface AppointmentDetailModalProps {
@@ -17,6 +17,8 @@ interface AppointmentDetailModalProps {
 export function AppointmentDetailModal({ appointment, onClose, onEdit }: AppointmentDetailModalProps) {
   const navigate = useNavigate();
   const checkin = useCheckin(appointment.id);
+  const callPatient = useCallPatient(appointment.id);
+
   const start = new Date(appointment.scheduled_at);
   const end = new Date(appointment.end_at);
   const dateLabel = format(start, "EEEE, d 'de' MMMM 'de' yyyy", { locale: ptBR });
@@ -32,6 +34,60 @@ export function AppointmentDetailModal({ appointment, onClose, onEdit }: Appoint
     });
   }
 
+  function handleCallPatient() {
+    callPatient.mutate(undefined, {
+      onError: () => toast.error('Erro ao chamar paciente.'),
+    });
+  }
+
+  function handleOpenRecord() {
+    if (appointment.clinical_record_id) {
+      onClose();
+      navigate(`/prontuario/${appointment.clinical_record_id}`, { state: { from: 'agenda' } });
+    }
+  }
+
+  const actionButtons = (() => {
+    switch (appointment.status) {
+      case 'scheduled':
+        return (
+          <>
+            <Button variant="secondary" onClick={handleCallPatient} loading={callPatient.isPending}>
+              <Bell className="h-4 w-4" />
+              {callPatient.isPending ? 'Chamando...' : 'Chamar Paciente'}
+            </Button>
+            <Button onClick={handleCheckin} loading={checkin.isPending}>
+              <Play className="h-4 w-4" />
+              {checkin.isPending ? 'Iniciando...' : 'Iniciar Atendimento'}
+            </Button>
+          </>
+        );
+      case 'waiting':
+        return (
+          <Button onClick={handleCheckin} loading={checkin.isPending}>
+            <Play className="h-4 w-4" />
+            {checkin.isPending ? 'Iniciando...' : 'Iniciar Atendimento'}
+          </Button>
+        );
+      case 'in_progress':
+        return (
+          <Button variant="ghost" onClick={handleOpenRecord}>
+            <FileText className="h-4 w-4" />
+            Abrir Prontuário
+          </Button>
+        );
+      case 'completed':
+        return (
+          <Button variant="ghost" onClick={handleOpenRecord}>
+            <FileText className="h-4 w-4" />
+            Ver Prontuário
+          </Button>
+        );
+      default:
+        return null;
+    }
+  })();
+
   return (
     <Modal
       title="Detalhes da Consulta"
@@ -44,12 +100,7 @@ export function AppointmentDetailModal({ appointment, onClose, onEdit }: Appoint
             <Pencil className="h-4 w-4" />
             Editar
           </Button>
-          {appointment.status === 'scheduled' && (
-            <Button onClick={handleCheckin} loading={checkin.isPending}>
-              <Play className="h-4 w-4" />
-              {checkin.isPending ? 'Iniciando...' : 'Iniciar Atendimento'}
-            </Button>
-          )}
+          {actionButtons}
         </div>
       }
     >

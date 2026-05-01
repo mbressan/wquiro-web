@@ -14,6 +14,7 @@ import { AppointmentModal } from '@/components/agenda/AppointmentModal';
 import { AppointmentDetailModal } from '@/components/agenda/AppointmentDetailModal';
 import { AgendaEventModal } from '@/components/agenda/AgendaEventModal';
 import { BookingFeeAlert } from '@/components/agenda/BookingFeeAlert';
+import { TodayPatientsList } from '@/components/agenda/TodayPatientsList';
 import type { Appointment, AppointmentCreate } from '@/types/appointment';
 import type { AgendaEventCreate } from '@/types/agenda';
 
@@ -114,6 +115,17 @@ export default function AgendaPage() {
 
   return (
     <PageContainer size="xl">
+      <div className="flex gap-4 min-h-0">
+        {/* Painel lateral — Pacientes de hoje */}
+        <aside className="w-[280px] shrink-0 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden self-start sticky top-4">
+          <TodayPatientsList
+            onSelectAppointment={setSelectedAppointment}
+            professionalId={agendaContext}
+          />
+        </aside>
+
+        {/* Conteúdo principal */}
+        <div className="flex-1 min-w-0 space-y-4">
       <PageHeader
         title="Agenda"
         subtitle={
@@ -229,6 +241,8 @@ export default function AgendaPage() {
           error={createEvent.isError ? 'Erro ao criar evento.' : null}
         />
       )}
+        </div>{/* fim conteúdo principal */}
+      </div>{/* fim flex container */}
     </PageContainer>
   );
 }

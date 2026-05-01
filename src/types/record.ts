@@ -63,6 +63,7 @@ export interface ClinicalRecord {
   plan: string;
   clinical_data: ClinicalData;
   exam_files: ExamFile[];
+  is_locked: boolean;
   created_at: string;
   updated_at: string;
 }

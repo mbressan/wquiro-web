@@ -1,6 +1,7 @@
 export type AppointmentStatus =
   | 'pending_payment'
   | 'scheduled'
+  | 'waiting'
   | 'in_progress'
   | 'completed'
   | 'cancelled'
@@ -52,6 +53,10 @@ export interface Appointment {
   booking_fee_required: boolean;
   booking_fee_paid: boolean;
   booking_fee_amount: string | null;
+  called_at: string | null;
+  started_at: string | null;
+  duration_seconds: number | null;
+  duration_minutes: string | null;
   // FullCalendar shape
   resourceId: string;
   title: string;

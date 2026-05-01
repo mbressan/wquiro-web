@@ -4,6 +4,7 @@ export type AppointmentStatus =
   | 'pending_payment'
   | 'scheduled'
   | 'confirmed'
+  | 'waiting'
   | 'in_progress'
   | 'completed'
   | 'cancelled'
@@ -17,6 +18,7 @@ const APPOINTMENT_MAP: Record<AppointmentStatus, { label: string; cls: string }>
   pending_payment: { label: 'Aguard. pagamento', cls: 'bg-yellow-100 text-yellow-700' },
   scheduled:       { label: 'Agendado',           cls: 'bg-blue-100 text-blue-700' },
   confirmed:       { label: 'Confirmado',          cls: 'bg-emerald-100 text-emerald-700' },
+  waiting:         { label: 'Aguardando',          cls: 'bg-yellow-100 text-yellow-700' },
   in_progress:     { label: 'Em atendimento',      cls: 'bg-violet-100 text-violet-700' },
   completed:       { label: 'Concluído',           cls: 'bg-gray-100 text-gray-600' },
   cancelled:       { label: 'Cancelado',           cls: 'bg-red-100 text-red-600' },
