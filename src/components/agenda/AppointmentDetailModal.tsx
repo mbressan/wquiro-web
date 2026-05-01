@@ -52,34 +52,34 @@ export function AppointmentDetailModal({ appointment, onClose, onEdit }: Appoint
       case 'scheduled':
         return (
           <>
-            <Button variant="secondary" onClick={handleCallPatient} loading={callPatient.isPending}>
-              <Bell className="h-4 w-4" />
+            <Button size="sm" variant="secondary" onClick={handleCallPatient} loading={callPatient.isPending}>
+              <Bell className="h-3.5 w-3.5" />
               {callPatient.isPending ? 'Chamando...' : 'Chamar Paciente'}
             </Button>
-            <Button onClick={handleCheckin} loading={checkin.isPending}>
-              <Play className="h-4 w-4" />
+            <Button size="sm" onClick={handleCheckin} loading={checkin.isPending}>
+              <Play className="h-3.5 w-3.5" />
               {checkin.isPending ? 'Iniciando...' : 'Iniciar Atendimento'}
             </Button>
           </>
         );
       case 'waiting':
         return (
-          <Button onClick={handleCheckin} loading={checkin.isPending}>
-            <Play className="h-4 w-4" />
+          <Button size="sm" onClick={handleCheckin} loading={checkin.isPending}>
+            <Play className="h-3.5 w-3.5" />
             {checkin.isPending ? 'Iniciando...' : 'Iniciar Atendimento'}
           </Button>
         );
       case 'in_progress':
         return (
-          <Button variant="ghost" onClick={handleOpenRecord}>
-            <FileText className="h-4 w-4" />
+          <Button size="sm" variant="ghost" onClick={handleOpenRecord}>
+            <FileText className="h-3.5 w-3.5" />
             Abrir Prontuário
           </Button>
         );
       case 'completed':
         return (
-          <Button variant="ghost" onClick={handleOpenRecord}>
-            <FileText className="h-4 w-4" />
+          <Button size="sm" variant="ghost" onClick={handleOpenRecord}>
+            <FileText className="h-3.5 w-3.5" />
             Ver Prontuário
           </Button>
         );
@@ -92,15 +92,17 @@ export function AppointmentDetailModal({ appointment, onClose, onEdit }: Appoint
     <Modal
       title="Detalhes da Consulta"
       onClose={onClose}
-      size="sm"
+      size="md"
       footer={
-        <div className="flex justify-end gap-2">
-          <Button variant="secondary" onClick={onClose}>Fechar</Button>
-          <Button variant="secondary" onClick={onEdit}>
-            <Pencil className="h-4 w-4" />
-            Editar
-          </Button>
-          {actionButtons}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex gap-2">
+            <Button variant="secondary" size="sm" onClick={onClose}>Fechar</Button>
+            <Button variant="secondary" size="sm" onClick={onEdit}>
+              <Pencil className="h-3.5 w-3.5" />
+              Editar
+            </Button>
+          </div>
+          {actionButtons && <div className="flex gap-2">{actionButtons}</div>}
         </div>
       }
     >
