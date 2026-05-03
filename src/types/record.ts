@@ -1,6 +1,14 @@
 import type { PosturalAssessment } from './posture';
 import type { SpineMapData } from './spineMap';
 
+export type SignatureType = 'none' | 'variable' | 'fixed';
+
+export const SIGNATURE_LABELS: Record<SignatureType, string> = {
+  none: 'Não assinar',
+  variable: 'Certificado variável',
+  fixed: 'Certificado: Assinar',
+};
+
 export type RecordType = 'anamnesis' | 'follow_up' | 'reevaluation' | 'discharge';
 
 export type SpineMap = SpineMapData;
@@ -15,6 +23,15 @@ export interface Derifield {
   result: 'positive_left' | 'positive_right' | 'negative';
   affected_vertebra: string;
   notes: string;
+}
+
+export interface AnamnesisHistory {
+  diseases?: string;
+  surgeries?: string;
+  family_history?: string;
+  habits?: string;
+  allergies?: string;
+  medications?: string;
 }
 
 export interface AnamnesisClinicalData {
@@ -37,6 +54,7 @@ export interface AnamnesisClinicalData {
   leg_check?: LegCheck;
   derifield?: Derifield;
   posture_assessment?: PosturalAssessment;
+  anamnesis?: AnamnesisHistory;
 }
 
 export interface FollowUpClinicalData {
@@ -47,6 +65,7 @@ export interface FollowUpClinicalData {
   spine_map?: SpineMap;
   leg_check?: LegCheck;
   derifield?: Derifield;
+  anamnesis?: AnamnesisHistory;
 }
 
 export type ClinicalData = AnamnesisClinicalData | FollowUpClinicalData;
@@ -64,6 +83,7 @@ export interface ClinicalRecord {
   clinical_data: ClinicalData;
   exam_files: ExamFile[];
   is_locked: boolean;
+  signature_type: SignatureType;
   created_at: string;
   updated_at: string;
 }

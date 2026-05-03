@@ -3,6 +3,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { AuthLayout } from '@/layouts/AuthLayout'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { ProntuarioLayout } from '@/layouts/ProntuarioLayout'
 import { SkeletonPage } from '@/components/ui'
 
 const LoginPage = lazy(() =>
@@ -115,24 +116,6 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: '/pacientes/:patientId/prontuario',
-            handle: { title: 'Prontuários' },
-            element: (
-              <Suspense fallback={<Loading />}>
-                <PatientProntuarioPage />
-              </Suspense>
-            ),
-          },
-          {
-            path: '/prontuario/:id',
-            handle: { title: 'Prontuário' },
-            element: (
-              <Suspense fallback={<Loading />}>
-                <ProntuarioPage />
-              </Suspense>
-            ),
-          },
-          {
             path: '/financeiro/caixa',
             handle: { title: 'Caixa' },
             element: (
@@ -192,6 +175,29 @@ export const router = createBrowserRouter([
             element: (
               <Suspense fallback={<Loading />}>
                 <RelatoriosPage />
+              </Suspense>
+            ),
+          },
+        ],
+      },
+      {
+        element: <ProntuarioLayout />,
+        children: [
+          {
+            path: '/prontuario/:id',
+            handle: { title: 'Prontuário' },
+            element: (
+              <Suspense fallback={<Loading />}>
+                <ProntuarioPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: '/pacientes/:patientId/prontuario',
+            handle: { title: 'Prontuários' },
+            element: (
+              <Suspense fallback={<Loading />}>
+                <PatientProntuarioPage />
               </Suspense>
             ),
           },

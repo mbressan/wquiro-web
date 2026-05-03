@@ -70,10 +70,15 @@ export function AppointmentDetailModal({ appointment, onClose, onEdit }: Appoint
           </Button>
         );
       case 'in_progress':
-        return (
+        return appointment.clinical_record_id ? (
           <Button size="sm" variant="ghost" onClick={handleOpenRecord}>
             <FileText className="h-3.5 w-3.5" />
             Abrir Prontuário
+          </Button>
+        ) : (
+          <Button size="sm" onClick={handleCheckin} loading={checkin.isPending}>
+            <Play className="h-3.5 w-3.5" />
+            {checkin.isPending ? 'Criando prontuário...' : 'Abrir Prontuário'}
           </Button>
         );
       case 'completed':

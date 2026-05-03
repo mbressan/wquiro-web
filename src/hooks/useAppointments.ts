@@ -6,6 +6,7 @@ import type {
   PaginatedAppointments,
   SessionPackage,
 } from '@/types/appointment';
+import type { SignatureType } from '@/types/record';
 
 export const APPOINTMENTS_KEY = 'appointments';
 
@@ -128,5 +129,29 @@ export function useSessionPackages(patientId?: string) {
         .get<SessionPackage[]>('/agenda/pacotes/', { params: patientId ? { patient: patientId } : {} })
         .then((r) => r.data),
     enabled: !!patientId,
+  });
+}
+
+interface FinalizePayload {
+  signature_type: SignatureType;
+}
+
+interface FinalizeResponse {
+  appointment_id: string;
+  clinical_record_id: string;
+  status: 'completed';
+  is_locked: true;
+  signature_type: SignatureType;
+}
+
+export function useFinalize(appointmentId: string) {
+  const qc = useQueryClient();
+  return useMutation<FinalizeResponse, Error, FinalizePayload>({
+    mutationFn: (payload) =>
+      api.post<FinalizeResponse>(`/consultas/${appointmentId}/finalizar/`, payload).then((r) => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: [APPOINTMENTS_KEY, appointmentId] });
+      qc.invalidateQueries({ queryKey: ['clinical-records'] });
+    },
   });
 }

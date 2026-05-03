@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Play, X } from 'lucide-react';
+import { FileText, Play, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { StatusBadge, AppointmentTypeBadge, Button } from '@/components/ui';
@@ -31,6 +31,17 @@ export function AppointmentDetailCard({ appointment, onClose }: AppointmentDetai
       onError: () => toast.error('Erro ao iniciar atendimento.'),
     });
   }
+
+  function handleOpenRecord() {
+    if (appointment.clinical_record_id) {
+      onClose();
+      navigate(`/prontuario/${appointment.clinical_record_id}`, { state: { from: 'dashboard' } });
+    }
+  }
+
+  const isInProgress = appointment.status === 'in_progress';
+  const isCompleted = appointment.status === 'completed';
+  const canOpenRecord = (isInProgress || isCompleted) && appointment.clinical_record_id;
 
   return (
     <div className="relative rounded-xl border border-gray-200 bg-white shadow-sm p-6 max-w-sm">
@@ -79,14 +90,25 @@ export function AppointmentDetailCard({ appointment, onClose }: AppointmentDetai
         )}
       </dl>
 
-      <Button
-        onClick={handleCheckin}
-        loading={checkin.isPending}
-        className="bg-primary-600 text-white w-full mt-4"
-      >
-        <Play className="h-4 w-4" />
-        {checkin.isPending ? 'Iniciando...' : 'Atender'}
-      </Button>
+      {canOpenRecord ? (
+        <Button
+          onClick={handleOpenRecord}
+          variant="ghost"
+          className="w-full mt-4"
+        >
+          <FileText className="h-4 w-4" />
+          {isInProgress ? 'Abrir Prontuário' : 'Ver Prontuário'}
+        </Button>
+      ) : !isCompleted && (
+        <Button
+          onClick={handleCheckin}
+          loading={checkin.isPending}
+          className="bg-primary-600 text-white w-full mt-4"
+        >
+          <Play className="h-4 w-4" />
+          {checkin.isPending ? 'Iniciando...' : isInProgress ? 'Abrir Prontuário' : 'Atender'}
+        </Button>
+      )}
     </div>
   );
 }

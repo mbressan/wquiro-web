@@ -6,6 +6,7 @@ import type { ConsultationRecording } from '@/types/recording';
 interface RecordingButtonProps {
   clinicalRecordId: string;
   onRecordingUploaded: (recording: ConsultationRecording) => void;
+  disabled?: boolean;
 }
 
 function formatTime(seconds: number) {
@@ -14,7 +15,7 @@ function formatTime(seconds: number) {
   return `${m}:${s}`;
 }
 
-export default function RecordingButton({ clinicalRecordId, onRecordingUploaded }: RecordingButtonProps) {
+export default function RecordingButton({ clinicalRecordId, onRecordingUploaded, disabled }: RecordingButtonProps) {
   const { state, elapsedSeconds, error, isSupported, startRecording, stopRecording, reset } =
     useRecording({ clinicalRecordId, onUploaded: onRecordingUploaded });
 
@@ -75,6 +76,15 @@ export default function RecordingButton({ clinicalRecordId, onRecordingUploaded 
           <MicOff className="h-4 w-4 mr-1" />
           Parar
         </Button>
+      </div>
+    );
+  }
+
+  if (disabled) {
+    return (
+      <div className="flex items-center gap-2 text-sm text-gray-400">
+        <MicOff className="h-4 w-4" />
+        <span>Gravação indisponível — prontuário finalizado</span>
       </div>
     );
   }

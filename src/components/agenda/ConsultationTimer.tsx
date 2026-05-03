@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 interface ConsultationTimerProps {
   startedAt: string | null | undefined;
+  fallback?: string;
 }
 
 function formatElapsed(seconds: number): string {
@@ -14,7 +15,7 @@ function formatElapsed(seconds: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-export function ConsultationTimer({ startedAt }: ConsultationTimerProps) {
+export function ConsultationTimer({ startedAt, fallback }: ConsultationTimerProps) {
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export function ConsultationTimer({ startedAt }: ConsultationTimerProps) {
     return () => clearInterval(id);
   }, [startedAt]);
 
-  if (!startedAt) return null;
+  if (!startedAt) return fallback ? <span>{fallback}</span> : null;
 
   return <span>{formatElapsed(elapsed)}</span>;
 }
