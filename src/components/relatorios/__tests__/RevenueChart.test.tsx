@@ -3,7 +3,7 @@ import { RevenueChart } from '../RevenueChart'
 
 // ResizeObserver is not available in jsdom
 beforeAll(() => {
-  global.ResizeObserver = class {
+  globalThis.ResizeObserver = class {
     observe() {}
     unobserve() {}
     disconnect() {}

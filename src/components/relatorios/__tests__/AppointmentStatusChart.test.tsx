@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { AppointmentStatusChart } from '../AppointmentStatusChart'
 
 beforeAll(() => {
-  global.ResizeObserver = class {
+  globalThis.ResizeObserver = class {
     observe() {}
     unobserve() {}
     disconnect() {}

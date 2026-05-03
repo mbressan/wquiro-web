@@ -2,6 +2,7 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import api from '@/lib/api'
 import type {
   HomeKPIs,
+  HomeDashboard,
   OperacionalData,
   OperacionalPorProfissionalData,
   FinanceiroData,
@@ -72,6 +73,17 @@ export function useRetencao(period: string, date: string) {
 export function useExportReport() {
   return useMutation<{ task_id: string }, unknown, ExportRequest>({
     mutationFn: (data) => api.post('/relatorios/export/', data).then((r) => r.data),
+  })
+}
+
+export function useDashboardKPIs(period: string, professionalId?: string) {
+  return useQuery({
+    queryKey: ['relatorios', 'home-dashboard', period, professionalId],
+    queryFn: () =>
+      api.get('/relatorios/home-dashboard/', {
+        params: { period, ...(professionalId && { professional_id: professionalId }) }
+      }).then(r => r.data as HomeDashboard),
+    staleTime: 5 * 60 * 1000,
   })
 }
 

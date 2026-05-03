@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { ByMethodChart } from '../ByMethodChart'
 
 beforeAll(() => {
-  global.ResizeObserver = class {
+  globalThis.ResizeObserver = class {
     observe() {}
     unobserve() {}
     disconnect() {}

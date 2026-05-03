@@ -93,3 +93,46 @@ export interface PeriodValue {
   period: 'month' | 'year' | 'quarter' | 'week'
   date: string // YYYY-MM
 }
+
+export type HomePeriodOption = 'today' | 'last_7_days' | 'last_30_days' | 'this_month' | 'last_month'
+
+export interface HomeDashboardKPIs {
+  scheduled: number
+  confirmed: number
+  completed: number
+  no_show: number
+}
+
+export interface ChartDataPoint {
+  name: string
+  value: number
+}
+
+export interface DurationDataPoint {
+  appointment_type: string
+  avg_minutes: number
+}
+
+export interface HomeDashboardCharts {
+  patients_by_type: ChartDataPoint[]
+  by_appointment_type: ChartDataPoint[]
+  by_convenio: ChartDataPoint[]
+  avg_duration_by_type: DurationDataPoint[]
+}
+
+export interface HomeDashboardAppointment {
+  id: string
+  scheduled_at: string
+  patient_name: string
+  professional_name: string
+  appointment_type: string
+  status: string
+  clinical_record_id: string | null
+}
+
+export interface HomeDashboard {
+  period: string
+  kpis: HomeDashboardKPIs
+  charts: HomeDashboardCharts
+  appointments: HomeDashboardAppointment[]
+}
